@@ -42,7 +42,7 @@ export default class Tax{
     
     calculateTax(month = this.currentMonth, year = this.currentYear){
         if (this.isHourly) {
-            if(hours == NaN){
+            if(isNaN(this.hours)){
                 return NaN
             }
             switch(this.frequency){
@@ -53,7 +53,7 @@ export default class Tax{
                 case "bi-weekly":
                     return this.check/(2*this.hours * this.payRate);
                 case "monthly":
-                    return this.check/((this.hours/5) *this.getWorkdaysInMonth(year, month)* this.payRate);
+                    return this.check/((this.hours/5) * this.getWorkdaysInMonth(year, month)* this.payRate);
                 case "yearly":
                     return this.check/((this.hours*52)* this.payRate);
                 default:

@@ -65,7 +65,7 @@ button:hover {
     left: 10px; /* Adjust this value as needed */
 
 }
-#taxf{
+#taxf, #predictf{
     text-align: left;
     display: block;
     display: inline-block;

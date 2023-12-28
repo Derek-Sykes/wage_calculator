@@ -1,6 +1,7 @@
 import express from 'express'
 const Router = express.Router();
 import Tax from '../controllers/tax.js'
+import Predict from '../controllers/predict_check.js'
 
 
 const redirectLogin = (req, res, next) => {
@@ -81,4 +82,65 @@ Router.post('/tax', redirectLogin, (req, res) => {
     });
 })
 
+Router.get('/predict', redirectLogin, (req, res) => {
+    const { user } = res.locals
+    res.status(201).render('predict_check', { 
+        userId: user.id, 
+        first_name: user.first_name, 
+        last_name: user.last_name, 
+        email: user.email, 
+        username: user.username,
+        answer: ''
+    });
+})
+
+Router.post('/predict', redirectLogin, (req, res) => {
+    let { frequency, timePeriod, tax, payRate, isHourly, hours, days  } = req.body
+    if(tax.includes('%')){
+        tax = tax.replace("%", "")
+    }
+    tax = Math.abs((parseFloat(tax)/100)-1)
+    console.log(frequency, tax, payRate, isHourly, hours, days)
+    let { year, month } = timePeriod.split('-') || null;
+    let predict = new Predict(frequency, tax, payRate, isHourly, hours, days)
+    console.log(predict);
+    
+    let answer = predict.calculatePredict(month, year).toFixed(2)
+    console.log(answer)
+    // answer = (100-(answer*100)).toFixed(1)
+    res.status(201).render('predict_check', { 
+        answer: answer
+    });
+})
+
+Router.get('/bag', redirectLogin, (req, res) => {
+    const { user } = res.locals
+    res.status(201).render('time_to_bag', { 
+        userId: user.id, 
+        first_name: user.first_name, 
+        last_name: user.last_name, 
+        email: user.email, 
+        username: user.username,
+        answer: ''
+    });
+})
+
+Router.post('/bag', redirectLogin, (req, res) => {
+    let { frequency, timePeriod, tax, payRate, isHourly, hours, days  } = req.body
+    if(tax.includes('%')){
+        tax = tax.replace("%", "")
+    }
+    tax = Math.abs((parseFloat(tax)/100)-1)
+    console.log(frequency, tax, payRate, isHourly, hours, days)
+    let { year, month } = timePeriod.split('-') || null;
+    let predict = new Predict(frequency, tax, payRate, isHourly, hours, days)
+    console.log(predict);
+    
+    let answer = predict.calculatePredict(month, year).toFixed(2)
+    console.log(answer)
+    // answer = (100-(answer*100)).toFixed(1)
+    res.status(201).render('time_to_bag', { 
+        answer: answer
+    });
+})
 export default Router;

@@ -1,11 +1,13 @@
-export default class PredictCheck{
+// how much youll make in x time
+export default class Time{
 
-    constructor(frequency, tax, payRate, isHourly, hours=0){
-        this.frequency = frequency;
+    constructor(timePeriod, tax, payRate, isHourly, hours=0,days=0){
+        this.timePeriod = timePeriod;
         this.tax = tax;
         this.payRate = payRate;
         this.isHourly = isHourly === 'hourly';
         this.hours = hours || NaN;
+        this.days = days || NaN;
         this.currentDate = new Date();
         this.currentMonth = this.currentDate.getMonth() + 1;
         this.currentYear = this.currentDate.getFullYear();
@@ -38,36 +40,35 @@ export default class PredictCheck{
     
     calculateTax(month = this.currentMonth, year = this.currentYear){
         if (this.isHourly) {
-            if(hours == NaN){
+            if(isNaN(this.hours)){
                 return NaN
             }
-            switch(this.frequency){
+            switch(this.timePeriod){
                 case "daily":
-                    return this.check / this.payRate * hours/5
+                    return this.payRate * this.hours/this.days * this.tax
                 case "weekly":
-                    return this.check/(this.hours * this.payRate);
+                    return this.payRate * this.hours * this.tax
                 case "bi-weekly":
-                    return this.check/(2*this.hours * this.payRate);
+                    return this.payRate * (this.hours*2) * this.tax
                 case "monthly":
-                    return this.check/((this.hours/5) *this.getWorkdaysInMonth(year, month)* this.payRate);
+                    return this.payRate * ((this.hours/5) * this.getWorkdaysInMonth(year,month)) * this.tax
                 case "yearly":
-                    return this.check/((this.hours*52)* this.payRate);
+                    return this.payRate * (this.hours*52) * this.tax
                 default:
                     return NaN
             }
         }else{
-            switch(this.frequency){
-                
+            switch(this.timePeriod){
+                case "hourly":
+                    return (((this.payRate/52)/5)/8) * this.tax
                 case "daily":
-                    return this.check / ((this.payRate/52)/5)
+                    return ((this.payRate/52)/5) * this.tax
                 case "weekly":
-                    return this.check / (this.payRate/52)
+                    return (this.payRate/52) * this.tax
                 case "bi-weekly":
-                    return this.check / ((this.payRate/52)*2)
+                    return ((this.payRate/52)*2) * this.tax
                 case "monthly":
-                    return this.check / (this.payRate/12)
-                case "yearly":
-                    return this.check/this.payRate;
+                    return ((this.payRate/12)) * this.tax
                 default:
                     return NaN
             }

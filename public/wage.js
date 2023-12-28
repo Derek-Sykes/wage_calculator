@@ -38,3 +38,7 @@
 // document.querySelector("#submit").addEventListener('click', (event)=>{
 //     updateUI()
 // })
+let tax = "35"
+if(tax.includes('%')){
+    console.log("it does")
+}

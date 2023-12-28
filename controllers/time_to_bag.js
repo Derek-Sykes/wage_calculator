@@ -1,7 +1,8 @@
-export default class PredictCheck{
+export default class TimeToBag{
 
-    constructor(frequency, tax, payRate, isHourly, hours=0, days=0){
-        this.frequency = frequency;
+    constructor(sum, tax, payRate, isHourly, hours=0, days=0){
+        this.totalHours;
+        this.sum = sum;
         this.tax = tax;
         this.payRate = payRate;
         this.isHourly = isHourly === 'hourly';
@@ -37,41 +38,46 @@ export default class PredictCheck{
         return workdayCount;
     }
     
-    calculatePredict(month = this.currentMonth, year = this.currentYear){
+    calculateTax(month = this.currentMonth, year = this.currentYear){
+        if (this.isHourly) {
+            this.totalHours = this.sum/(this.payRate*tax)
+            return this.totalHours
+        }
+        this.totalHours = this.sum/((((this.payRate/52)/5)/8) * this.tax)
+        return this.totalHours
+        
+
+    }
+    convertToTimePeriod(timePeriod){
         if (this.isHourly) {
             if(isNaN(this.hours)){
                 return NaN
             }
-            switch(this.frequency){
-                case "daily":
-                    return this.payRate * (this.hours/this.days) * this.tax
-                case "weekly":
-                    return this.payRate * this.hours * this.tax
-                case "bi-weekly":
-                    return this.payRate * (this.hours*2) * this.tax
-                case "monthly":
-                    return this.payRate * ((this.hours/5  * this.getWorkdaysInMonth(year, month)) * this.tax);
-                case "yearly":
-                    return this.payRate * (this.hours*52) * this.tax
+            switch(timePeriod){
+                case "days":
+                    return this.totalHours/(this.hours/this.days)
+                case "weeks":
+                    return this.totalHours/this.hours
+                case "months":
+                    return this.this.totalHours/((this.hours/5)* this.getWorkdaysInMonth(year,month))
+                case "years":
+                    return this.totalHours/(this.hours*52)
                 default:
                     return NaN
             }
         }else{
-            switch(this.frequency){
-                case "daily":
-                    return ((this.payRate/52)/5) * this.tax
-                case "weekly":
-                    return (this.payRate/52) * this.tax
-                case "bi-weekly":
-                    return (this.payRate/52) * 2 * this.tax
-                case "monthly":
-                    return (this.payRate/12) * this.tax
-                case "yearly":
-                    return this.payRate * this.tax
+            switch(timePeriod){
+                case "days":
+                    return this.totalHours/8
+                case "weeks":
+                    return this.totalHours/40
+                case "months":
+                    return this.totalHours/730
+                case "years":
+                    return this.totalHours/(730*12)
                 default:
                     return NaN
             }
         }
-
     }
 }
