@@ -6,8 +6,8 @@ export default class TimeToBag{
         this.tax = tax;
         this.payRate = payRate;
         this.isHourly = isHourly === 'hourly';
-        this.hours = hours || NaN;
-        this.days = days || NaN;
+        this.hours = hours || NaN
+        this.days = days || NaN
         this.currentDate = new Date();
         this.currentMonth = this.currentDate.getMonth() + 1;
         this.currentYear = this.currentDate.getFullYear();
@@ -38,17 +38,16 @@ export default class TimeToBag{
         return workdayCount;
     }
     
-    calculateTax(month = this.currentMonth, year = this.currentYear){
+    calculateTimeToBag(){
         if (this.isHourly) {
-            this.totalHours = this.sum/(this.payRate*tax)
+            this.totalHours = this.sum/(this.payRate*this.tax)
             return this.totalHours
         }
         this.totalHours = this.sum/((((this.payRate/52)/5)/8) * this.tax)
         return this.totalHours
-        
-
     }
-    convertToTimePeriod(timePeriod){
+
+    convertToTimePeriod(timePeriod, month=this.currentMonth, year=this.currentYear){
         if (this.isHourly) {
             if(isNaN(this.hours)){
                 return NaN
@@ -59,7 +58,7 @@ export default class TimeToBag{
                 case "weeks":
                     return this.totalHours/this.hours
                 case "months":
-                    return this.this.totalHours/((this.hours/5)* this.getWorkdaysInMonth(year,month))
+                    return this.totalHours/((this.hours/5)* this.getWorkdaysInMonth(year,month))
                 case "years":
                     return this.totalHours/(this.hours*52)
                 default:
@@ -72,9 +71,9 @@ export default class TimeToBag{
                 case "weeks":
                     return this.totalHours/40
                 case "months":
-                    return this.totalHours/730
+                    return this.totalHours/((40*52)/12)
                 case "years":
-                    return this.totalHours/(730*12)
+                    return this.totalHours/(40*52)
                 default:
                     return NaN
             }
