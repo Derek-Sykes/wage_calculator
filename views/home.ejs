@@ -8,8 +8,9 @@
 </head>
 
 <body>
-    
+
     <% if (userId) { %>
+         <!-- if your logged in this is your home page -->
         <header>
             <h1><%= page %></h1>
             <a href="/home" id="home">Home</a>
@@ -35,6 +36,7 @@
         </footer>
 
     <% } else { %>
+        <!-- if your not logged in this is your home page -->
         <header>
             <h1><%= page %></h1>
             <a href="/" id="home">Home</a>
