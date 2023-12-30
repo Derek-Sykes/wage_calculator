@@ -9,7 +9,11 @@
 <body>
     <header>
         <h1>Taxes</h1>
-        <a href="/home" id="home">Home</a>
+        <% if (userId) { %>
+            <a href="/home" id="home">Home</a>
+        <% } else { %>
+            <a href="/" id="home">Home</a>
+        <% } %>
     </header>
     <main>
         <form action="/tax" method="post" id="taxf">

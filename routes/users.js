@@ -184,7 +184,7 @@ Router.post('/logout', redirectLogin, (req, res) => {
         }
 
         res.clearCookie(SESS_NAME)
-        res.redirect('/login')
+        res.redirect('/')
     })
 })
 

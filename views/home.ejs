@@ -12,7 +12,7 @@
     <% if (userId) { %>
         <header>
             <h1><%= page %></h1>
-            <a href="/home">Home</a>
+            <a href="/home" id="home">Home</a>
             <h3>Wage Calculator</h1>
         </header>
         <main>
@@ -24,7 +24,6 @@
             <button onclick="location.href='/tax'">getting taxed</button>
             <button onclick="location.href='/predict'">getting per check</button>
             <button onclick="location.href='/bag'">needing to work to get X money</button>
-            <button onclick="location.href='/time'">getting in a time frame</button>
             <button onclick="location.href='/hourly'">making per hour</button>
 
         </main>
@@ -38,7 +37,20 @@
     <% } else { %>
         <header>
             <h1><%= page %></h1>
+            <a href="/" id="home">Home</a>
+            <h3>Wage Calculator</h1>
         </header>
+        <main>
+            <p>Hello!</p> <br>
+            <p>Welcome to the Wage Calculator website!</p>
+            <p>What would you like to find out about your job?</p>
+            <p>How much am i...</p>
+            <button onclick="location.href='/tax'">getting taxed</button>
+            <button onclick="location.href='/predict'">getting per check</button>
+            <button onclick="location.href='/bag'">needing to work to get X money</button>
+            <button onclick="location.href='/hourly'">making per hour</button>
+
+        </main>
         <footer>
             <a href="/login">Login</a>
             <a href="/register">Register</a>

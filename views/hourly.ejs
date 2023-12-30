@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Check Prediction</title>
+    <title>Hourly Rate</title>
 </head>
 <body>
     <header>
-        <h1>Check Prediction</h1>
+        <h1>Hourly Rate</h1>
         <% if (userId) { %>
             <a href="/home" id="home">Home</a>
         <% } else { %>
             <a href="/" id="home">Home</a>
         <% } %>
+        
     </header>
     <main>
-        <form action="/predict" method="post" id="predictf">
+        <form action="/hourly" method="post" id="hourlyf">
             <label for="frequency">How often do you recieve a check?: </label>
             <select id="frequency" name="frequency" required>
                 <option value="daily">Daily</option>
@@ -27,10 +28,10 @@
             </select><br>
             <label id="timePeriodl" for="timePeriod" hidden>Whats the year and month that you want to calculate for?: </label>
             <input type="month" name="timePeriod" id="timePeriod" hidden><br>
-            <label id="tax" for="tax">How much do you expect to get taxed?: </label>
-            <input type="text" name="tax" id="tax" required><br>
-            <label for="payRate">What is your advertised pay?: </label>
-            <input type="text" name="payRate" id="payRate" required><br>
+            <label id="tax" for="tax">How much were you taxed?: </label>
+            <input type="text" name="tax" id="tax"><br>
+            <label for="check">How much did you recive your most recent check?: </label>
+            <input type="text" name="check" id="check" required><br>
             <label for="isHourly">Are you paid Hourly or salery?: </label>
             <select id="isHourly" name="isHourly" required>
                 <option value="salery">Salary</option>
@@ -44,7 +45,7 @@
         </form>
         <div id="results">
             <% if (answer) { %>
-                <p id="a">Your check will be $<%= answer %>
+                <p id="a">Your <%= answer.tax %> tax hourly rate is $<%= answer.rate %>
             <% } %>
         </div>
         <script src="/public/wage.js"></script>
