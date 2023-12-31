@@ -90,12 +90,26 @@ Router.use((req, res, next) => {
 
 // login get
 Router.get('/login', redirectHome, (req, res) => {
-    res.status(201).render('login');
+    res.status(201).render('login', {
+        layout: './layouts/users',
+        page: 'Login',
+        link: {
+            route: '/register',
+            name: 'Register'
+        }
+    });
 
 })
 // register get
 Router.get('/register', redirectHome, (req, res) => {
-    res.status(200).render('register');
+    res.status(200).render('register', {
+        layout: './layouts/users',
+        page: 'Register',
+        link: {
+            route: '/login',
+            name: 'Login'
+        }
+    });
 
 })
 // login post

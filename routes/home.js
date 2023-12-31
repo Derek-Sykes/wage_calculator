@@ -71,7 +71,7 @@ Router.get('/tax', (req, res) => {
         });
     }catch{
         res.status(201).render('tax', {
-            page: 'Welcome',
+            page: 'Tax',
             userId: '',
             answer: ''
         });

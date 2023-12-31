@@ -1,99 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Check Prediction</title>
-</head>
-<body>
-    <header>
-        <h1>Check Prediction</h1>
-        <% if (userId) { %>
-            <a href="/home" id="home">Home</a>
-        <% } else { %>
-            <a href="/" id="home">Home</a>
+<main>
+    <form action="/predict" method="post" id="predictf">
+        <label for="frequency">How often do you recieve a check?: </label>
+        <select id="frequency" name="frequency" required>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="bi-weekly" selected>Bi-Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select><br>
+        <label id="timePeriodl" for="timePeriod" hidden>Whats the year and month that you want to calculate for?: </label>
+        <input type="month" name="timePeriod" id="timePeriod" hidden><br>
+        <label id="tax" for="tax">How much do you expect to get taxed?: </label>
+        <input type="text" name="tax" id="tax" required><br>
+        <label for="payRate">What is your advertised pay?: </label>
+        <input type="text" name="payRate" id="payRate" required><br>
+        <label for="isHourly">Are you paid Hourly or salery?: </label>
+        <select id="isHourly" name="isHourly" required>
+            <option value="salery">Salary</option>
+            <option value="hourly">Hourly</option>
+        </select><br>
+        <label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
+        <input type="text" name="hours" id="hours" hidden><br>
+        <label id="daysl" for="days" hidden>How many days do you work a week?: </label>
+        <input type="text" name="days" id="days" hidden><br>
+        <input type="submit" id="submit">
+    </form>
+    <div id="results">
+        <% if (answer) { %>
+            <p id="a">Your check will be $<%= answer %>
         <% } %>
-    </header>
-    <main>
-        <form action="/predict" method="post" id="predictf">
-            <label for="frequency">How often do you recieve a check?: </label>
-            <select id="frequency" name="frequency" required>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="bi-weekly" selected>Bi-Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-            </select><br>
-            <label id="timePeriodl" for="timePeriod" hidden>Whats the year and month that you want to calculate for?: </label>
-            <input type="month" name="timePeriod" id="timePeriod" hidden><br>
-            <label id="tax" for="tax">How much do you expect to get taxed?: </label>
-            <input type="text" name="tax" id="tax" required><br>
-            <label for="payRate">What is your advertised pay?: </label>
-            <input type="text" name="payRate" id="payRate" required><br>
-            <label for="isHourly">Are you paid Hourly or salery?: </label>
-            <select id="isHourly" name="isHourly" required>
-                <option value="salery">Salary</option>
-                <option value="hourly">Hourly</option>
-            </select><br>
-            <label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
-            <input type="text" name="hours" id="hours" hidden><br>
-            <label id="daysl" for="days" hidden>How many days do you work a week?: </label>
-            <input type="text" name="days" id="days" hidden><br>
-            <input type="submit" id="submit">
-        </form>
-        <div id="results">
-            <% if (answer) { %>
-                <p id="a">Your check will be $<%= answer %>
-            <% } %>
-        </div>
-        <script src="/public/wage.js"></script>
-        <script>
-            let frequencyEl = document.getElementById("frequency")
-            let isHourlyEl = document.getElementById("isHourly")
-            let hoursEl = document.getElementById("hours")
-            let hourslEl = document.getElementById("hoursl")
-            let daysEl = document.getElementById("days")
-            let dayslEl = document.getElementById("daysl")
-            let timePeriodEl = document.getElementById("timePeriod")
-            let timePeriodlEl=document.getElementById("timePeriodl")
-            
-            isHourlyEl.onchange = function() {
-                if(isHourlyEl.value == "hourly") {
-                    hoursEl.hidden = false;
-                    hourslEl.hidden = false;
-                    if(frequencyEl.value == "monthly"){
-                        timePeriodlEl.hidden = false
-                        timePeriodEl.hidden = false
-                    }else if(frequencyEl.value == "daily"){
-                        daysEl.hidden = false;
-                        dayslEl.hidden = false;
-                        timePeriodlEl.hidden = true
-                        timePeriodEl.hidden = true
-                    }else{
-                        timePeriodlEl.hidden = true
-                        timePeriodEl.hidden = true
-                    }
-                }else{
-                    hoursEl.hidden = true;
-                    hourslEl.hidden = true;
-                    timePeriodlEl.hidden = true
-                    timePeriodEl.hidden = true
-                    daysEl.hidden = true;
-                    dayslEl.hidden = true;
-                }
-            }
-
-            frequencyEl.onchange = function() {
+    </div>
+    <script src="/public/wage.js"></script>
+    <script>
+        let frequencyEl = document.getElementById("frequency")
+        let isHourlyEl = document.getElementById("isHourly")
+        let hoursEl = document.getElementById("hours")
+        let hourslEl = document.getElementById("hoursl")
+        let daysEl = document.getElementById("days")
+        let dayslEl = document.getElementById("daysl")
+        let timePeriodEl = document.getElementById("timePeriod")
+        let timePeriodlEl=document.getElementById("timePeriodl")
+        
+        isHourlyEl.onchange = function() {
+            if(isHourlyEl.value == "hourly") {
+                hoursEl.hidden = false;
+                hourslEl.hidden = false;
                 if(frequencyEl.value == "monthly"){
-                    if(isHourlyEl.value == "hourly") {
-                        timePeriodlEl.hidden = false
-                        timePeriodEl.hidden = false
-                    }else{
-                        timePeriodlEl.hidden = true
-                        timePeriodEl.hidden = true
-                    }
-                }else if(frequencyEl.value == "daily" && isHourlyEl.value == "hourly"){
+                    timePeriodlEl.hidden = false
+                    timePeriodEl.hidden = false
+                }else if(frequencyEl.value == "daily"){
                     daysEl.hidden = false;
                     dayslEl.hidden = false;
                     timePeriodlEl.hidden = true
@@ -101,11 +56,37 @@
                 }else{
                     timePeriodlEl.hidden = true
                     timePeriodEl.hidden = true
-                    daysEl.hidden = true;
-                    dayslEl.hidden = true;
                 }
+            }else{
+                hoursEl.hidden = true;
+                hourslEl.hidden = true;
+                timePeriodlEl.hidden = true
+                timePeriodEl.hidden = true
+                daysEl.hidden = true;
+                dayslEl.hidden = true;
             }
-        </script>
-    </main>
-</body>
-</html>
+        }
+
+        frequencyEl.onchange = function() {
+            if(frequencyEl.value == "monthly"){
+                if(isHourlyEl.value == "hourly") {
+                    timePeriodlEl.hidden = false
+                    timePeriodEl.hidden = false
+                }else{
+                    timePeriodlEl.hidden = true
+                    timePeriodEl.hidden = true
+                }
+            }else if(frequencyEl.value == "daily" && isHourlyEl.value == "hourly"){
+                daysEl.hidden = false;
+                dayslEl.hidden = false;
+                timePeriodlEl.hidden = true
+                timePeriodEl.hidden = true
+            }else{
+                timePeriodlEl.hidden = true
+                timePeriodEl.hidden = true
+                daysEl.hidden = true;
+                dayslEl.hidden = true;
+            }
+        }
+    </script>
+</main>

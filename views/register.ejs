@@ -1,18 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Home Page</title>
-</head>
-
-<body>
-    <header>
-        <a href="/" id="home">Home</a>
-        <h1>Register</h1>
-    </header>
-    
+<main>
     <form action="/register" method="post">
         First Name: <input type="text" name="fname" required><br><br>
         Last Name: <input type="text" name="lname" required><br><br>
@@ -23,12 +9,6 @@
     </form>
 
     <p id="message">message</p>
-
-    <footer>
-        <a href="/login">Login</a>
-    </footer>
-    
-
 
     <script>
         // Function to get query parameters from the URL
@@ -43,5 +23,5 @@
         // Display the message in the HTML page
         document.getElementById('message').textContent = message;
     </script>
-</body>
-</html>
+</main>
+    

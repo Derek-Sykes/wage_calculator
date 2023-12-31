@@ -1,64 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Home Page</title>
-</head>
-
-<body>
-
+<main>
     <% if (userId) { %>
-         <!-- if your logged in this is your home page -->
-        <header>
-            <h1><%= page %></h1>
-            <a href="/home" id="home">Home</a>
-            <h3>Wage Calculator</h1>
-        </header>
-        <main>
-            <p>Hello <%= first_name %>!</p> <br>
+        <!-- if your logged in this is your home page -->
+           <p>Hello <%= first_name %>!</p> <br>
 
-            <p>Welcome to the Wage Calculator website!</p>
-            <p>What would you like to find out about your job?</p>
-            <p>How much am i...</p>
-            <button onclick="location.href='/tax'">getting taxed</button>
-            <button onclick="location.href='/predict'">getting per check</button>
-            <button onclick="location.href='/bag'">needing to work to get X money</button>
-            <button onclick="location.href='/hourly'">making per hour</button>
+           <p>Welcome to the Wage Calculator website!</p>
+           <p>What would you like to find out about your job?</p>
+           <p>How much am i...</p>
+           <button onclick="location.href='/tax'">getting taxed</button>
+           <button onclick="location.href='/predict'">getting per check</button>
+           <button onclick="location.href='/bag'">needing to work to get X money</button>
+           <button onclick="location.href='/hourly'">making per hour</button>
 
-        </main>
-
-        <footer>
-            <form method="post" action="/logout">
-                <button>Logout</button>
-            </form>
-        </footer>
-
-    <% } else { %>
-        <!-- if your not logged in this is your home page -->
-        <header>
-            <h1><%= page %></h1>
-            <a href="/" id="home">Home</a>
-            <h3>Wage Calculator</h1>
-        </header>
-        <main>
-            <p>Hello!</p> <br>
-            <p>Welcome to the Wage Calculator website!</p>
-            <p>What would you like to find out about your job?</p>
-            <p>How much am i...</p>
-            <button onclick="location.href='/tax'">getting taxed</button>
-            <button onclick="location.href='/predict'">getting per check</button>
-            <button onclick="location.href='/bag'">needing to work to get X money</button>
-            <button onclick="location.href='/hourly'">making per hour</button>
-
-        </main>
-        <footer>
-            <a href="/login">Login</a>
-            <a href="/register">Register</a>
-        </footer>
-        
-    <% } %>
-    
-</body>
-</html>
+   <% } else { %>
+       <!-- if your not logged in this is your home page -->
+           <p>Hello!</p> <br>
+           <p>Welcome to the Wage Calculator website!</p>
+           <p>What would you like to find out about your job?</p>
+           <p>How much am i...</p>
+           <button onclick="location.href='/tax'">getting taxed</button>
+           <button onclick="location.href='/predict'">getting per check</button>
+           <button onclick="location.href='/bag'">needing to work to get X money</button>
+           <button onclick="location.href='/hourly'">making per hour</button>
+   <% } %>
+</main>
