@@ -1,15 +1,20 @@
 <main>
+    
     <% if (userId) { %>
         <!-- if your logged in this is your home page -->
-           <p>Hello <%= first_name %>!</p> <br>
-
-           <p>Welcome to the Wage Calculator website!</p>
-           <p>What would you like to find out about your job?</p>
-           <p>How much am i...</p>
-           <button onclick="location.href='/tax'">getting taxed</button>
-           <button onclick="location.href='/predict'">getting per check</button>
-           <button onclick="location.href='/bag'">needing to work to get X money</button>
-           <button onclick="location.href='/hourly'">making per hour</button>
+        <div class="text">
+            <p>Hello <%= first_name %></p>
+            <p>Welcome to the Wage Calculator website!</p>
+        </div>
+        
+        <div class="sidebar">
+            <p>What would you like to find out about your job?</p>
+            <p>How much am i...</p>
+            <button onclick="location.href='/tax'">getting taxed</button>
+            <button onclick="location.href='/predict'">getting per check</button>
+            <button onclick="location.href='/bag'">needing to work to get X money</button>
+            <button onclick="location.href='/hourly'">making per hour</button>
+        </div>
 
    <% } else { %>
        <!-- if your not logged in this is your home page -->

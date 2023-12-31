@@ -1,3 +1,11 @@
+header {
+    background-color: hsl(0, 0%, 20%);
+    color: #fff;
+    padding: 1em;
+    margin-bottom: 10px;
+    
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -5,14 +13,6 @@ body {
     background-color: #f4f4f4;
     text-align: center;
 }
-
-header {
-    background-color: hsl(0, 0%, 20%);
-    color: #fff;
-    padding: 1em;
-    margin-bottom: 10px;
-}
-
 main {
     padding: 2em;
 }
@@ -27,16 +27,6 @@ footer {
     padding: 10px;
     text-align: center;
     margin-top: 10px;
-
-
-}
-
-h1 {
-    color: #ffffff;
-}
-
-p {
-    color: #666;
 }
 
 a {
@@ -74,3 +64,41 @@ button:hover {
 input, select{
     margin-bottom: 10px;
 }
+
+.text{
+    color: #666;
+}
+
+.sidebar {
+    /* Set width, height, and other styling properties */
+    width: 250px; /* Adjust width as needed */
+    height: 100%; /* Set height to fill the entire height of the sidebar */
+    background-color: #2d2c2ed2; /* Background color for the sidebar */
+    color: #fff; /* Text color */
+    padding: 20px; /* Padding for content inside the sidebar */
+    box-sizing: border-box; /* Include padding and border in the total width and height */
+    color: #f4f4f4;
+    position: fixed;
+    top: 112px;
+    bottom: 0;
+    left: 0;
+  }
+  
+  /* Example styling for the content inside the sidebar */
+  .sidebar button {
+    font-size: 18px;
+    margin-bottom: 10px;
+    width: 180px;
+  }
+  
+  .sidebar p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  .sidebar h2 {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
