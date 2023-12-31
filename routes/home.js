@@ -22,6 +22,13 @@ const redirectHome = (req, res, next) => {
     }
 }
 
+// TODO make function actually post the job to the db
+function postJob(job){
+    console.log(job);
+}
+
+
+
 // main
 Router.get('/', (req, res) => {
     try{
@@ -46,14 +53,17 @@ Router.get('/', (req, res) => {
 //home get
 Router.get('/home', redirectLogin, (req, res) => {
     const { user } = res.locals
+    console.log(req.session.jobs)
     res.status(201).render('home', {
         page: 'Home', 
         userId: user.id, 
         first_name: user.first_name, 
         last_name: user.last_name, 
         email: user.email, 
-        username: user.username
+        username: user.username,
+        jobs: req.session.jobs
     });
+    
 })
 
 //tax get
@@ -251,5 +261,47 @@ Router.post('/hourly', (req, res) => {
         answer: answer
     });
 })
+
+Router.get('/enter-job', redirectLogin, (req, res) => {
+    try{
+        const { user } = res.locals
+        res.status(201).render('enter-job', {
+            page: 'Enter Job', 
+            userId: user.id, 
+            first_name: user.first_name, 
+            last_name: user.last_name, 
+            email: user.email, 
+            username: user.username
+        });
+        console.log(req.session.jobs)
+    }catch{
+        res.status(201).render('error');
+    }
+})
+
+Router.post('/enter-job', redirectLogin, (req, res) => {
+    const { user } = res.locals
+    let { frequency, tax, payRate, isHourly, hours, days, save  } = req.body
+    console.log(frequency, tax, payRate, isHourly, hours, days, save)
+
+    let job = {
+        frequency: frequency,
+        tax: tax, 
+        payRate: payRate, 
+        isHourly: isHourly, 
+        hours: hours, 
+        days: days
+    }
+    if(save) {
+        postJob(job)
+    }else{
+        req.session.jobs.push(job)
+        console.log(req.session.jobs)
+    }
+    
+    
+    res.status(201).redirect('home');
+})
+
 
 export default Router;

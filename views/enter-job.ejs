@@ -1,0 +1,51 @@
+<main>
+    <form action="/enter-job" method="post" id="ejf">
+        <label for="frequency">How often do you recieve a check?: </label>
+        <select id="frequency" name="frequency" required>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="bi-weekly" selected>Bi-Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select><br>
+        <label id="tax" for="tax">How much gets taken out for taxes?: </label>
+        <input type="text" name="tax" id="tax"><br>
+        <label for="payRate">What is your advertised pay?: </label>
+        <input type="text" name="payRate" id="payRate" required><br>
+        <label for="isHourly">Are you paid Hourly or salery?: </label>
+        <select id="isHourly" name="isHourly" required>
+            <option value="salery">Salary</option>
+            <option value="hourly">Hourly</option>
+        </select><br>
+        <label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
+        <input type="text" name="hours" id="hours" hidden><br>
+        <label id="daysl" for="days" hidden>How many days do you work a week?: </label>
+        <input type="text" name="days" id="days" hidden><br>
+        <input type="checkbox" name="save" id="save">
+        <label for="save">Do you want to save this job to your account <br>(will automatically save to this session)</label><br><br>
+        
+        <input type="submit" id="submit">
+    </form>
+
+        <script>
+            let isHourlyEl = document.getElementById("isHourly")
+            let hoursEl = document.getElementById("hours")
+            let hourslEl = document.getElementById("hoursl")
+            let daysEl = document.getElementById("days")
+            let dayslEl = document.getElementById("daysl")
+            isHourlyEl.onchange = function() {
+                if(isHourlyEl.value == "hourly") {
+                    hoursEl.hidden = false;
+                    hourslEl.hidden = false;
+                    daysEl.hidden = false;
+                    dayslEl.hidden = false;
+                }else{
+                    hoursEl.hidden = true;
+                    hourslEl.hidden = true;
+                    daysEl.hidden = true;
+                    dayslEl.hidden = true;
+                }
+
+            }
+        </script>
+</main>

@@ -3,8 +3,20 @@
     <% if (userId) { %>
         <!-- if your logged in this is your home page -->
         <div class="text">
-            <p>Hello <%= first_name %></p>
-            <p>Welcome to the Wage Calculator website!</p>
+            <h4>Hello <%= first_name %></h4>
+            <h4>Welcome to the Wage Calculator website!</h4><br>
+            <p>Would you like to enter a job and find out more things?</p>
+            <% if(jobs.length){ %>
+                <% for(job of jobs){ %>
+                    <p><%= job.payRate %></p>
+                <% } %>
+            <% }else{ %>
+                <p>No jobs found</p>
+            <% } %>
+            <form action="/enter-job" method="get">
+                <button type="submit" >Enter Job</button>
+            </form>
+            
         </div>
         
         <div class="sidebar">

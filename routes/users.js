@@ -64,6 +64,12 @@ function isSecure(password){
     return password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password);
 }
 
+// TODO make function actually get the job from the db
+function getJobs(){
+    let jobs = []
+    return jobs;
+}
+
 
 
 //Routes
@@ -131,6 +137,7 @@ Router.post('/login', redirectHome, async (req, res) => {
         // login success
         if (user && isMatch){
             req.session.userId = user.id;
+            req.session.jobs = getJobs();
             return res.redirect("/home")
         }else{
             message = 'Invalid Username or Password'

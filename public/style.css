@@ -1,6 +1,6 @@
 header {
-    background-color: hsl(0, 0%, 20%);
-    color: #fff;
+    background-color: #1a1a1a;
+    color: hsl(0, 0%, 100%);
     padding: 1em;
     margin-bottom: 10px;
     
@@ -10,7 +10,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #ecffe1;
     text-align: center;
 }
 main {
@@ -22,7 +22,7 @@ footer {
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #333;
+    background-color: #1a1a1a;
     color: #fff;
     padding: 10px;
     text-align: center;
@@ -30,14 +30,16 @@ footer {
 }
 
 a {
-    color: #7fd4f3;
     text-decoration: none;
     margin: 0 10px;
+    color: #8ab4f8;
+    filter: saturate(200%);
+    filter: brightness(120%) contrast(120%);
 }
 
 button {
     background-color: #4caf50;
-    color: #8bd5f5;
+    color: #fff;
     padding: 10px 20px;
     font-size: 16px;
     border: none;
@@ -53,9 +55,10 @@ button:hover {
     position: absolute;
     top: 10px; /* Adjust this value as needed */
     left: 10px; /* Adjust this value as needed */
-
+    color: #8ab4f8;
+    
 }
-#taxf, #predictf, #hourlyf, #bagf{
+#taxf, #predictf, #hourlyf, #bagf, #ejf{
     text-align: left;
     display: block;
     display: inline-block;
@@ -73,7 +76,7 @@ input, select{
     /* Set width, height, and other styling properties */
     width: 250px; /* Adjust width as needed */
     height: 100%; /* Set height to fill the entire height of the sidebar */
-    background-color: #2d2c2ed2; /* Background color for the sidebar */
+    background-color: #272727; /* Background color for the sidebar */
     color: #fff; /* Text color */
     padding: 20px; /* Padding for content inside the sidebar */
     box-sizing: border-box; /* Include padding and border in the total width and height */
@@ -82,6 +85,8 @@ input, select{
     top: 112px;
     bottom: 0;
     left: 0;
+    opacity: 100%;
+    
   }
   
   /* Example styling for the content inside the sidebar */
