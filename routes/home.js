@@ -22,9 +22,11 @@ const redirectHome = (req, res, next) => {
     }
 }
 
-// TODO make function actually post the job to the db
+
 function postJob(job){
+    // TODO make function actually post the job to the db
     console.log(job);
+    req.session.jobs.push(job)
 }
 
 
@@ -53,7 +55,6 @@ Router.get('/', (req, res) => {
 //home get
 Router.get('/home', redirectLogin, (req, res) => {
     const { user } = res.locals
-    console.log(req.session.jobs)
     res.status(201).render('home', {
         page: 'Home', 
         userId: user.id, 
@@ -91,16 +92,28 @@ Router.get('/tax', (req, res) => {
 Router.post('/tax', (req, res) => {
     const { frequency, timePeriod, check, payRate, isHourly, hours  } = req.body
     console.log(frequency, timePeriod, check, payRate, isHourly, hours)
-    let { year, month } = timePeriod.split('-') || null;
+    let [ year, month ] = timePeriod.split('-') || null;
     let tax = new Tax(frequency, check, payRate, isHourly, hours)
     console.log(tax);
     
     let answer = tax.calculateTax(month, year)
     console.log(answer)
     answer = (100-(answer*100)).toFixed(1)
-    res.status(201).render('tax', { 
-        answer: answer
-    });
+
+    try {
+        const { user } = res.locals
+        res.status(201).render('tax', { 
+            page: "tax",
+            answer: answer,
+            userId: user.id
+        });
+    } catch {
+        res.status(201).render('tax', { 
+            page: "tax",
+            answer: answer,
+            userId: ''
+        });
+    }
 })
 
 Router.get('/predict', (req, res) => {
@@ -131,16 +144,28 @@ Router.post('/predict', (req, res) => {
     }
     tax = Math.abs((parseFloat(tax)/100)-1)
     console.log(frequency, tax, payRate, isHourly, hours, days)
-    let { year, month } = timePeriod.split('-') || null;
+    let [ year, month ] = timePeriod.split('-') || null
     let predict = new Predict(frequency, tax, payRate, isHourly, hours, days)
     console.log(predict);
     
     let answer = predict.calculatePredict(month, year).toFixed(2)
     console.log(answer)
     // answer = (100-(answer*100)).toFixed(1)
-    res.status(201).render('predict_check', { 
-        answer: answer
-    });
+    try {
+        const { user } = res.locals
+        res.status(201).render('predict_check', { 
+            page: "Predict Check",
+            answer: answer,
+            userId: user.id
+        });
+    } catch {
+        res.status(201).render('predict_check', { 
+            page: "Predict Check",
+            answer: answer,
+            userId: ''
+        });
+    }
+    
 })
 
 Router.get('/bag', (req, res) => {
@@ -188,35 +213,87 @@ Router.post('/bag', (req, res) => {
     timeToBag.totalHours = answer.time
     
     console.log(answer)
-    res.status(201).render('time_to_bag', { 
-        answer: answer,
-        answer1:"",
-        hide1: 1,
-        hide2: 0
+
+    try{
+        const { user } = res.locals
+        
+        res.status(201).render('time_to_bag', { 
+            page: 'Time to bag',
+            userId: user.id, 
+            first_name: user.first_name, 
+            last_name: user.last_name, 
+            email: user.email, 
+            username: user.username,
+            answer: answer,
+            answer1:'',
+            hide1: 1,
+            hide2: 0
     });
+    }catch{
+        res.status(201).render('time_to_bag', {
+            page: 'Time to bag',
+            userId: '',
+            answer: answer,
+            answer1: '',
+            hide1: 1,
+            hide2: 0
+        });
+    }
+
+
+    
 })
 
 Router.post('/bag-time', (req, res) => {
-    let { timePeriod, date } = req.body
-    let  year, month;
-    if(date){
-        [year, month] = date.split('-') || [null, null];
+    let { timePeriod, month } = req.body
+    console.log(timePeriod, month)
+    let  year, month1;
+    if(month){
+        [year, month1] = month.split('-') || [null, null];
+    }else{
+        year = 0
+        month = 0
     }
-    
+    console.log(year, month1)
     console.log(timeToBag);
     
     let answer1 = {}
-    answer1.time = timeToBag.convertToTimePeriod(timePeriod, month, year).toFixed(2)
+    answer1.time = timeToBag.convertToTimePeriod(timePeriod, month1, year).toFixed(2)
     answer1.sum = timeToBag.sum
     answer1.timePeriod = timePeriod
     
     console.log(answer1)
-    res.status(201).render('time_to_bag', { 
-        answer1: answer1,
-        answer: "",
-        hide1: 1,
-        hide2: 0
-    });
+
+
+    try{
+        const { user } = res.locals
+    
+        res.status(201).render('time_to_bag', { 
+            page: 'Time to bag',
+            userId: user.id,
+            first_name: user.first_name, 
+            last_name: user.last_name, 
+            email: user.email, 
+            username: user.username,
+            answer1: answer1,
+            answer: "",
+            hide1: 1,
+            hide2: 0
+        });
+    }catch{
+        res.status(201).render('time_to_bag', {
+            page: 'Time to bag',
+            userId: '',
+            answer1: answer1,
+            answer: "",
+            hide1: 1,
+            hide2: 0
+        });
+    }
+
+
+
+    
 })
 
 
@@ -249,7 +326,7 @@ Router.post('/hourly', (req, res) => {
     }
     tax = Math.abs((parseFloat(tax)/100)-1)
     console.log(frequency, timePeriod, tax, check, isHourly, hours, days)
-    let { year, month } = timePeriod.split('-') || null;
+    let [ year, month ] = timePeriod.split('-') || null;
     let hourly = new Hourly(frequency, tax, check, isHourly, hours, days)
     console.log(hourly);
     
@@ -257,9 +334,20 @@ Router.post('/hourly', (req, res) => {
     answer.rate = hourly.calculateHourly(month, year).toFixed(2)
     answer.tax = tax ? "before": "after";
     console.log(answer)
-    res.status(201).render('hourly', { 
-        answer: answer
-    });
+    try {
+        const { user } = res.locals
+        res.status(201).render('hourly', { 
+            page: "hourly",
+            answer: answer,
+            userId: user.id
+        });
+    } catch {
+        res.status(201).render('hourly', { 
+            page: "hourly",
+            answer: answer,
+            userId: ''
+        });
+    }
 })
 
 Router.get('/enter-job', redirectLogin, (req, res) => {
@@ -281,26 +369,109 @@ Router.get('/enter-job', redirectLogin, (req, res) => {
 
 Router.post('/enter-job', redirectLogin, (req, res) => {
     const { user } = res.locals
-    let { frequency, tax, payRate, isHourly, hours, days, save  } = req.body
+    let { frequency, tax, payRate, isHourly, hours, days, save, name  } = req.body
+    isHourly = isHourly == 'hourly'
+    isHourly = isHourly ? 'Hourly' : 'Salary'
     console.log(frequency, tax, payRate, isHourly, hours, days, save)
-
+    let id
+    try {
+        id =  req.session.jobs[0].id + 1
+    } catch (error) {
+        id = 1
+    }
     let job = {
+        name: name,
         frequency: frequency,
         tax: tax, 
         payRate: payRate, 
         isHourly: isHourly, 
         hours: hours, 
-        days: days
+        days: days,
+        id: id,
+        selected: false
     }
+    // // make any job that was selected before no longer selected
+    // for(job of req.session.jobs){
+    //     if(job.selected) {
+    //         job.selected = false
+    //     }
+    // }
+    // if they said save the job the it goes to db other wise it just goes to session list
     if(save) {
         postJob(job)
     }else{
-        req.session.jobs.push(job)
+        req.session.jobs.unshift(job)
         console.log(req.session.jobs)
     }
     
     
     res.status(201).redirect('home');
+})
+
+Router.get('/jobs', redirectLogin, (req, res) => {
+    try{
+        const { user } = res.locals
+        res.status(201).render('jobs', {
+            page: 'Jobs', 
+            userId: user.id, 
+            first_name: user.first_name, 
+            last_name: user.last_name, 
+            email: user.email, 
+            username: user.username,
+            jobs: req.session.jobs
+        });
+    }catch{
+        res.status(201).render('error');
+    }
+})
+
+Router.post('/jobs', redirectLogin, (req, res) => {
+    const { user } = res.locals;
+    let jobs = req.session.jobs;
+    let jobId = req.body.jobId
+    console.log(jobId)
+    // if when you select another job any job is selected it makes it false and makes the job you selected at that id true
+    for(let job of jobs){
+        if(job.selected){
+            job.selected = false
+        }
+        if(job.id == jobId){
+            job.selected = true
+        }
+    }
+    console.log(req.session.jobs)
+
+    
+    
+    res.status(201).redirect('jobs');
+})
+
+
+Router.get('/delete', redirectLogin, (req, res) => {
+    try{
+        const { user } = res.locals
+        const jobId = req.query.jobId
+        let jobs = req.session.jobs
+        req.session.jobs = jobs.filter(job => job.id != jobId)
+        console.log(req.session.jobs)
+        res.status(201).redirect('jobs');
+    }catch{
+        res.status(201).render('error');
+    }
+})
+
+Router.get('/modify', redirectLogin, (req, res) => {
+    try{
+        const { user } = res.locals
+        const jobId = req.query.jobId
+        let jobs = req.session.jobs
+        // TODO logic to modify
+
+        console.log(req.session.jobs)
+        res.status(201).redirect('jobs');
+    }catch{
+        res.status(201).render('error');
+    }
 })
 
 

@@ -16,9 +16,10 @@ export default class TimeToBag{
     getWorkdaysInMonth(year, month) {
         // Validate inputs
         if (isNaN(year) || isNaN(month) || month < 1 || month > 12) {
-            throw new Error('Invalid year or month');
+            year = this.currentYear
+            month = this.currentMonth
         }
-    
+        console.log(year, month)
         // Calculate the number of days in the month
         const daysInMonth = new Date(year, month, 0).getDate();
     

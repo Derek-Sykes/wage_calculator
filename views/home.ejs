@@ -2,17 +2,10 @@
     
     <% if (userId) { %>
         <!-- if your logged in this is your home page -->
-        <div class="text">
+        <div class="center">
             <h4>Hello <%= first_name %></h4>
             <h4>Welcome to the Wage Calculator website!</h4><br>
-            <p>Would you like to enter a job and find out more things?</p>
-            <% if(jobs.length){ %>
-                <% for(job of jobs){ %>
-                    <p><%= job.payRate %></p>
-                <% } %>
-            <% }else{ %>
-                <p>No jobs found</p>
-            <% } %>
+            <p>Would you like to enter a job and find out more things?</p><br>
             <form action="/enter-job" method="get">
                 <button type="submit" >Enter Job</button>
             </form>
@@ -20,7 +13,7 @@
         </div>
         
         <div class="sidebar">
-            <p>What would you like to find out about your job?</p>
+            <h6>What would you like to find out about your job?</h6><br>
             <p>How much am i...</p>
             <button onclick="location.href='/tax'">getting taxed</button>
             <button onclick="location.href='/predict'">getting per check</button>
@@ -30,13 +23,16 @@
 
    <% } else { %>
        <!-- if your not logged in this is your home page -->
-           <p>Hello!</p> <br>
-           <p>Welcome to the Wage Calculator website!</p>
-           <p>What would you like to find out about your job?</p>
-           <p>How much am i...</p>
-           <button onclick="location.href='/tax'">getting taxed</button>
-           <button onclick="location.href='/predict'">getting per check</button>
-           <button onclick="location.href='/bag'">needing to work to get X money</button>
-           <button onclick="location.href='/hourly'">making per hour</button>
+       <div class="center">
+            <p>Hello!</p> <br>
+            <p>Welcome to the Wage Calculator website!</p>
+            <p>What would you like to find out about your job?</p>
+            <p style="margin-bottom: 50px;">How much am i...</p>
+            <button onclick="location.href='/tax'">getting taxed</button>
+            <button onclick="location.href='/predict'">getting per check</button>
+            <button onclick="location.href='/bag'">needing to work to get X money</button>
+            <button onclick="location.href='/hourly'">making per hour</button>
+       </div>
+           
    <% } %>
 </main>

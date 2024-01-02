@@ -37,8 +37,22 @@
 // //add event listener to the submit button
 // document.querySelector("#submit").addEventListener('click', (event)=>{
 //     updateUI()
-// })
-let tax = "35"
-if(tax.includes('%')){
-    console.log("it does")
-}
+// // })
+// window.onload = function(){
+//     for(let job of jobs){
+//         console.log(jobs)
+//         // every time the element select plus id is clicked
+//         document.getElementById("select"+job.id).addEventListener('click', function() {
+//             for(let Job of jobs){
+//                 if(Job.selected){
+//                     document.getElementById("paragraph"+Job.id).hidden = false
+//                     document.getElementById("select"+job.id).replaceWith(document.getElementById("paragraph"+Job.id))
+//                 }else{
+//                     document.getElementById("paragraph"+Job.id).hidden = true
+//                     document.getElementById("paragraph"+Job.id).replaceWith(document.getElementById("select"+job.id))
+//                 }
+//             }
+            
+//         })
+//     }
+// }

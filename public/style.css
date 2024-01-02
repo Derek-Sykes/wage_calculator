@@ -1,20 +1,49 @@
 header {
+    /* position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center; */
+    /* justify-content: space-between;
+    padding: 20px 10%;
     background-color: #1a1a1a;
     color: hsl(0, 0%, 100%);
-    padding: 1em;
-    margin-bottom: 10px;
+    margin-bottom: 10px; */
     
+}
+
+#nav{
+    padding-left: 10px;
+    filter: saturate(200%);
+
+}
+
+.page-name{
+    text-align: center;
 }
 
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
     background-color: #ecffe1;
-    text-align: center;
+
+    
 }
 main {
     padding: 2em;
+}
+
+.center{
+    text-align: center;
+}
+
+.card{
+    margin: 0 auto; 
+    margin-top: 40px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 footer {
@@ -22,7 +51,7 @@ footer {
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #1a1a1a;
+    background-color: #1e262e;
     color: #fff;
     padding: 10px;
     text-align: center;
@@ -32,9 +61,13 @@ footer {
 a {
     text-decoration: none;
     margin: 0 10px;
-    color: #8ab4f8;
+    color: #1e262e;
     filter: saturate(200%);
     filter: brightness(120%) contrast(120%);
+    
+}
+form{
+    text-align: center;
 }
 
 button {
@@ -51,13 +84,6 @@ button:hover {
     background-color: #45a049;
 }
 
-#home{
-    position: absolute;
-    top: 10px; /* Adjust this value as needed */
-    left: 10px; /* Adjust this value as needed */
-    color: #8ab4f8;
-    
-}
 #taxf, #predictf, #hourlyf, #bagf, #ejf{
     text-align: left;
     display: block;
@@ -68,21 +94,18 @@ input, select{
     margin-bottom: 10px;
 }
 
-.text{
-    color: #666;
-}
-
 .sidebar {
     /* Set width, height, and other styling properties */
     width: 250px; /* Adjust width as needed */
     height: 100%; /* Set height to fill the entire height of the sidebar */
-    background-color: #272727; /* Background color for the sidebar */
+    --bs-bg-opacity: 1;
+    background-color: #1e262e;
     color: #fff; /* Text color */
-    padding: 20px; /* Padding for content inside the sidebar */
+    padding: 40px; /* Padding for content inside the sidebar */
     box-sizing: border-box; /* Include padding and border in the total width and height */
     color: #f4f4f4;
     position: fixed;
-    top: 112px;
+    top: 54px;
     bottom: 0;
     left: 0;
     opacity: 100%;

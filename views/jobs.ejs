@@ -1,0 +1,60 @@
+<main>
+    <h1 class="center">Your Jobs</h1>
+    <% if(jobs.length){ %>
+        <% for(job of jobs){ %>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Job Title: <%= job.name %></h5><br>
+                  <h6 class="card-subtitle mb-2 text-body-secondary">Job details:</h6><hr>
+                  <p class="card-text">Hourly or Salary: <%= job.isHourly %></p>
+                  <p class="card-text">Pay Rate: <%= job.payRate %></p>
+                  <p class="card-text">Frequency: <%= job.frequency %></p>
+                  <p class="card-text">Tax: <%= job.tax %></p>
+                  
+                    <% if(job.hours){ %>
+                        <p class="card-text">Hours: <%= job.hours %></p>
+                    <% } %>
+                    <% if(job.days){ %>
+                        <p class="card-text">Days: <%= job.days %></p>
+                    <% } %>
+                  
+                  <a href="/delete?jobId=<%= job.id %>" class="card-link">Delete</a>
+                  <a href="/modify?jobId=<%= job.id %>" class="card-link">Modify</a>
+                  <p class="d-inline-block" id="paragraph<%= job.id %>" hidden>Selected</p>
+                  <form class="d-inline-block" action="/jobs" method="post" id="selectf<%= job.id %>" hidden>
+                    <input type="hidden" name="jobId" value="<%= job.id %>">
+                    <input id="select<%= job.id %>" type="submit" value="Select">
+                  </form>
+                </div>
+              </div>
+            </div>
+        <% } %>
+    <% }else{ %>
+        <p class="center" style="margin-top:50px;">No jobs found</p>
+        <div class="container d-flex justify-content-center align-items-center">
+            <a href="/enter-job" class="text-center">Add a Job</a>
+          </div>
+    <% } %>
+
+    <script>
+        window.onload = function(){
+            const jobs = JSON.parse(`<%- JSON.stringify(jobs) %>`);
+            jobs.forEach(job => {
+                if(job.selected){
+                    document.getElementById("paragraph"+job.id).hidden = false
+                    document.getElementById("paragraph"+job.id).classList = "d-inline-block"
+                    document.getElementById("select"+job.id).hidden = true
+                    //document.getElementById("select"+job.id).replaceWith(document.getElementById("paragraph"+job.id))
+                }else{
+                    document.getElementById("paragraph"+job.id).hidden = true
+                    document.getElementById("paragraph"+job.id).classList = ""
+                    document.getElementById("select"+job.id).hidden = false
+                    //document.getElementById("paragraph"+job.id).replaceWith(document.getElementById("select"+job.id))
+                }
+            });
+        }
+    </script>
+
+</main>
+
+
