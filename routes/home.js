@@ -29,6 +29,17 @@ function postJob(job){
     req.session.jobs.push(job)
 }
 
+let emptyJob = {
+    name: '',
+    frequency: '',
+    tax: '', 
+    payRate: '', 
+    isHourly: '',
+    hours: '', 
+    days: '',
+    id: '',
+    selected: false
+}
 
 
 // main
@@ -71,6 +82,8 @@ Router.get('/home', redirectLogin, (req, res) => {
 Router.get('/tax', (req, res) => {
     try{
         const { user } = res.locals
+        let jobs = req.session.jobs
+        let job = (jobs.filter(job => job.selected))[0]
         res.status(201).render('tax', {
             page: 'Tax', 
             userId: user.id, 
@@ -78,13 +91,16 @@ Router.get('/tax', (req, res) => {
             last_name: user.last_name, 
             email: user.email, 
             username: user.username,
-            answer: ''
+            answer: '',
+            job: job
+
         });
     }catch{
         res.status(201).render('tax', {
             page: 'Tax',
             userId: '',
-            answer: ''
+            answer: '',
+            job: emptyJob
         });
     }
 })
@@ -99,19 +115,24 @@ Router.post('/tax', (req, res) => {
     let answer = tax.calculateTax(month, year)
     console.log(answer)
     answer = (100-(answer*100)).toFixed(1)
-
+    
     try {
         const { user } = res.locals
+        let jobs = req.session.jobs
+        let job = (jobs.filter(job => job.selected))[0]
+
         res.status(201).render('tax', { 
             page: "tax",
             answer: answer,
-            userId: user.id
+            userId: user.id,
+            job: job
         });
     } catch {
         res.status(201).render('tax', { 
             page: "tax",
             answer: answer,
-            userId: ''
+            userId: '',
+            job: emptyJob
         });
     }
 })
@@ -119,6 +140,8 @@ Router.post('/tax', (req, res) => {
 Router.get('/predict', (req, res) => {
     try{
         const { user } = res.locals
+        let jobs = req.session.jobs
+        let job = (jobs.filter(job => job.selected))[0] || ''
         res.status(201).render('predict_check', {
             page: 'Predict Check', 
             userId: user.id, 
@@ -126,12 +149,14 @@ Router.get('/predict', (req, res) => {
             last_name: user.last_name, 
             email: user.email, 
             username: user.username,
+            job: job,
             answer: ''
         });
     }catch{
         res.status(201).render('predict_check', {
             page: 'Predict Check',
             userId: '',
+            job: '',
             answer: ''
         });
     }
@@ -150,18 +175,23 @@ Router.post('/predict', (req, res) => {
     
     let answer = predict.calculatePredict(month, year).toFixed(2)
     console.log(answer)
+    
     // answer = (100-(answer*100)).toFixed(1)
     try {
         const { user } = res.locals
+        let jobs = req.session.jobs
+        let job = (jobs.filter(job => job.selected))[0] || ''
         res.status(201).render('predict_check', { 
             page: "Predict Check",
             answer: answer,
+            job: job,
             userId: user.id
         });
     } catch {
         res.status(201).render('predict_check', { 
             page: "Predict Check",
             answer: answer,
+            job: '',
             userId: ''
         });
     }
@@ -172,6 +202,8 @@ Router.get('/bag', (req, res) => {
 
     try{
         const { user } = res.locals
+        let jobs = req.session.jobs
+        let job = (jobs.filter(job => job.selected))[0]
         res.status(201).render('time_to_bag', {
             page: 'Time to bag', 
             userId: user.id, 
@@ -181,6 +213,7 @@ Router.get('/bag', (req, res) => {
             username: user.username,
             answer: '',
             answer1: '',
+            job: job,
             hide1: 0,
             hide2: 1
         });
@@ -300,6 +333,8 @@ Router.post('/bag-time', (req, res) => {
 Router.get('/hourly', (req, res) => {
     try{
         const { user } = res.locals
+        let jobs = req.session.jobs
+        let job = (jobs.filter(job => job.selected))[0]
         res.status(201).render('hourly', {
             page: 'Hourly', 
             userId: user.id, 
@@ -307,6 +342,7 @@ Router.get('/hourly', (req, res) => {
             last_name: user.last_name, 
             email: user.email, 
             username: user.username,
+            job: job,
             answer: ''
         });
     }catch{
@@ -453,7 +489,6 @@ Router.get('/delete', redirectLogin, (req, res) => {
         const jobId = req.query.jobId
         let jobs = req.session.jobs
         req.session.jobs = jobs.filter(job => job.id != jobId)
-        console.log(req.session.jobs)
         res.status(201).redirect('jobs');
     }catch{
         res.status(201).render('error');
@@ -465,14 +500,53 @@ Router.get('/modify', redirectLogin, (req, res) => {
         const { user } = res.locals
         const jobId = req.query.jobId
         let jobs = req.session.jobs
-        // TODO logic to modify
-
-        console.log(req.session.jobs)
-        res.status(201).redirect('jobs');
+        let job = (jobs.filter(job => job.id == jobId))[0]
+        console.log(job.id)
+        res.status(201).render('modify-job', {
+            page: 'Modify Job', 
+            userId: user.id, 
+            first_name: user.first_name, 
+            last_name: user.last_name, 
+            email: user.email, 
+            username: user.username,
+            job: job
+        });
     }catch{
         res.status(201).render('error');
     }
 })
+
+Router.post('/modify', redirectLogin, (req, res) => {
+    const { user } = res.locals;
+    let jobs = req.session.jobs;
+    let { jobId, frequency, tax, payRate, isHourly, hours, days, name  } = req.body
+    isHourly = isHourly == 'hourly'
+    isHourly = isHourly ? 'Hourly' : 'Salary'
+    console.log(jobId, frequency, tax, payRate, isHourly, hours, days)
+    let job = (jobs.filter(job => job.id == jobId))[0]
+    console.log(job)
+    let newJob = {
+        name: name,
+        frequency: frequency,
+        tax: tax, 
+        payRate: payRate, 
+        isHourly: isHourly,
+        hours: hours, 
+        days: days,
+        id: job.id,
+        selected: job.selected
+    }
+    console.log(newJob)
+    jobs.forEach(job => {
+        if(job.id == jobId){
+            Object.assign(job,newJob);
+        }
+    });
+    console.log(jobs)
+    
+    res.status(201).redirect('jobs');
+})
+
 
 
 export default Router;

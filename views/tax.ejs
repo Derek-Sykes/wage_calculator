@@ -1,69 +1,167 @@
-<main class="center">
-    <form action="/tax" method="post" id="taxf">
-        <label for="frequency">How often do you recieve a check?: </label>
-        <select id="frequency" name="frequency" required>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="bi-weekly" selected>Bi-Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select><br>
-        <label id="timePeriodl" for="timePeriod" hidden>Whats the year and month that you want to calculate for?: </label>
-        <input type="month" name="timePeriod" id="timePeriod" hidden><br>
-        <label for="check">How much do you recieve per check?: </label>
-        <input type="text" name="check" id="check" required><br>
-        <label for="payRate">What is your advertised pay?: </label>
-        <input type="text" name="payRate" id="payRate" required><br>
-        <label for="isHourly">Are you paid Hourly or salery?: </label>
-        <select id="isHourly" name="isHourly" required>
-            <option value="salery">Salary</option>
-            <option value="hourly">Hourly</option>
-        </select><br>
-        <label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
-        <input type="text" name="hours" id="hours" hidden><br>
-        <input type="submit" id="submit">
-    </form>
-    <div id="results">
-        <% if (answer) { %>
-            <p id="a">You are getting taxed <%= answer %>% <br>And 7.65% of your check you definetly wont get back due to medicare and social security</p>
-        <% } %>
-    </div>
-    <script src="/public/wage.js"></script>
-    <script>
-        let frequencyEl = document.getElementById("frequency")
-        let isHourlyEl = document.getElementById("isHourly")
-        isHourlyEl.onchange = function() {
-            if(isHourlyEl.value == "hourly") {
-                document.getElementById("hours").hidden = false;
-                document.getElementById("hoursl").hidden = false;
-                if(frequencyEl.value == "monthly"){
-                    document.getElementById("timePeriodl").hidden = false
-                    document.getElementById("timePeriod").hidden = false
+<% if(userId && job){ %>
+    <main class="center">
+        <form action="/tax" method="post" id="taxf">
+            <label for="frequency">How often do you recieve a check?: </label>
+            <select id="frequency" name="frequency" required>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly" selected>Bi-Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+            </select><br>
+            <label id="timePeriodl" for="timePeriod" hidden>Whats the year and month that you want to calculate for?: </label>
+            <input type="month" name="timePeriod" id="timePeriod" hidden><br>
+            <label for="check">How much do you recieve per check?: </label>
+            <input type="text" name="check" id="check" required><br>
+            <label for="payRate">What is your advertised pay?: </label>
+            <input type="text" name="payRate" id="payRate" required><br>
+            <label for="isHourly">Are you paid Hourly or salery?: </label>
+            <select id="isHourly" name="isHourly" required>
+                <option value="salary">Salary</option>
+                <option value="hourly">Hourly</option>
+            </select><br>
+            <label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
+            <input type="text" name="hours" id="hours" hidden><br>
+            <input type="submit" id="submit"><br><br>
+            <label for="prefill">Click to prefill boxes based on current job: </label><br>
+            <input type="checkbox" name="prefill" id="prefill">
+        </form>
+        <div id="results">
+            <% if (answer) { %>
+                <p id="a">You are getting taxed <%= answer %>% <br>And 7.65% of your check you definetly wont get back due to medicare and social security</p>
+            <% } %>
+        </div>
+        <script src="/public/wage.js"></script>
+        <script>
+            let frequencyEl = document.getElementById("frequency")
+            let isHourlyEl = document.getElementById("isHourly")
+            let prefillEl = document.getElementById("prefill")
+    
+            prefillEl.addEventListener('click', function(){
+                if(prefillEl.checked){
+                    document.getElementById('frequency').value = '<%= job.frequency %>'.toLowerCase()
+                    document.getElementById('payRate').value = '<%= job.payRate %>'
+                    isHourlyEl.value = '<%= job.isHourly %>'.toLowerCase()
+                    isHourlyEl.dispatchEvent(new Event("change"))
+                    document.getElementById("hours").value = '<%= job.hours %>'
                 }else{
-                    document.getElementById("timePeriodl").hidden = true
-                    document.getElementById("timePeriod").hidden = true
+                    document.getElementById('frequency').value = ''
+                    document.getElementById('payRate').value = ''
+                    isHourlyEl.value = 'salary'
+                    isHourlyEl.dispatchEvent(new Event("change"))
+                    document.getElementById("hours").value = ''
                 }
-            }else{
-                document.getElementById("hours").hidden = true;
-                document.getElementById("hoursl").hidden = true;
-                document.getElementById("timePeriodl").hidden = true
-                document.getElementById("timePeriod").hidden = true
-            }
-        }
-
-        frequencyEl.onchange = function() {
-            if(frequencyEl.value == "monthly"){
+            })
+    
+    
+            isHourlyEl.onchange = function() {
                 if(isHourlyEl.value == "hourly") {
-                    document.getElementById("timePeriodl").hidden = false
-                    document.getElementById("timePeriod").hidden = false
+                    document.getElementById("hours").hidden = false;
+                    document.getElementById("hoursl").hidden = false;
+                    if(frequencyEl.value == "monthly"){
+                        document.getElementById("timePeriodl").hidden = false
+                        document.getElementById("timePeriod").hidden = false
+                    }else{
+                        document.getElementById("timePeriodl").hidden = true
+                        document.getElementById("timePeriod").hidden = true
+                        document.getElementById("timePeriod").value = ''
+                    }
+                }else{
+                    document.getElementById("hours").hidden = true;
+                    document.getElementById("hoursl").hidden = true;
+                    document.getElementById("timePeriodl").hidden = true
+                    document.getElementById("timePeriod").hidden = true
+                    document.getElementById("hours").value = "";
+                    document.getElementById("timePeriod").value = ''
+                }
+            }
+    
+            frequencyEl.onchange = function() {
+                if(frequencyEl.value == "monthly"){
+                    if(isHourlyEl.value == "hourly") {
+                        document.getElementById("timePeriodl").hidden = false
+                        document.getElementById("timePeriod").hidden = false
+                    }else{
+                        document.getElementById("timePeriodl").hidden = true
+                        document.getElementById("timePeriod").hidden = true
+                        document.getElementById("timePeriod").value = ''
+                    }
+                }else{
+                    document.getElementById("timePeriodl").hidden = true
+                    document.getElementById("timePeriod").hidden = true
+                    document.getElementById("timePeriod").value = ''
+                }
+            }
+        </script>
+    </main>
+<% }else{ %>
+    <main class="center">
+        <form action="/tax" method="post" id="taxf">
+            <label for="frequency">How often do you recieve a check?: </label>
+            <select id="frequency" name="frequency" required>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly" selected>Bi-Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+            </select><br>
+            <label id="timePeriodl" for="timePeriod" hidden>Whats the year and month that you want to calculate for?: </label>
+            <input type="month" name="timePeriod" id="timePeriod" hidden><br>
+            <label for="check">How much do you recieve per check?: </label>
+            <input type="text" name="check" id="check" required><br>
+            <label for="payRate">What is your advertised pay?: </label>
+            <input type="text" name="payRate" id="payRate" required><br>
+            <label for="isHourly">Are you paid Hourly or salery?: </label>
+            <select id="isHourly" name="isHourly" required>
+                <option value="salery">Salary</option>
+                <option value="hourly">Hourly</option>
+            </select><br>
+            <label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
+            <input type="text" name="hours" id="hours" hidden><br>
+            <input type="submit" id="submit">
+        </form>
+        <div id="results">
+            <% if (answer) { %>
+                <p id="a">You are getting taxed <%= answer %>% <br>And 7.65% of your check you definetly wont get back due to medicare and social security</p>
+            <% } %>
+        </div>
+        <script src="/public/wage.js"></script>
+        <script>
+            let frequencyEl = document.getElementById("frequency")
+            let isHourlyEl = document.getElementById("isHourly")
+            isHourlyEl.onchange = function() {
+                if(isHourlyEl.value == "hourly") {
+                    document.getElementById("hours").hidden = false;
+                    document.getElementById("hoursl").hidden = false;
+                    if(frequencyEl.value == "monthly"){
+                        document.getElementById("timePeriodl").hidden = false
+                        document.getElementById("timePeriod").hidden = false
+                    }else{
+                        document.getElementById("timePeriodl").hidden = true
+                        document.getElementById("timePeriod").hidden = true
+                    }
+                }else{
+                    document.getElementById("hours").hidden = true;
+                    document.getElementById("hoursl").hidden = true;
+                    document.getElementById("timePeriodl").hidden = true
+                    document.getElementById("timePeriod").hidden = true
+                }
+            }
+
+            frequencyEl.onchange = function() {
+                if(frequencyEl.value == "monthly"){
+                    if(isHourlyEl.value == "hourly") {
+                        document.getElementById("timePeriodl").hidden = false
+                        document.getElementById("timePeriod").hidden = false
+                    }else{
+                        document.getElementById("timePeriodl").hidden = true
+                        document.getElementById("timePeriod").hidden = true
+                    }
                 }else{
                     document.getElementById("timePeriodl").hidden = true
                     document.getElementById("timePeriod").hidden = true
                 }
-            }else{
-                document.getElementById("timePeriodl").hidden = true
-                document.getElementById("timePeriod").hidden = true
             }
-        }
-    </script>
-</main>
+        </script>
+    </main>
+<% } %>
