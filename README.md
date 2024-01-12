@@ -24,7 +24,7 @@ from this project so far ive learned that the webpage sends a http request in th
 
 1. make sure you have a MYSQL database server
 2. create a schema called 'wage_calc' (not including the quotes)
-3. use this command to create the table 
+3. use this SQL command to create the table 
 
     CREATE TABLE `accounts` (
       `id` int NOT NULL AUTO_INCREMENT,
