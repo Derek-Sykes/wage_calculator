@@ -1,6 +1,7 @@
-##Wage Calculator
 
-##Description:
+<h1>Wage Calculator</h1>
+
+<h3>Description:</h3>
 
 I wanted to make this wage calculator because there have been many times ive gotten a new job and wanted to figure out how much i would make or how much im getting taxed and all these other things i would always have to think of the algrithm to find these things out and many other people i know wanted to know the answer to these questions too and had no idea how to even find the answers.
 
@@ -18,32 +19,30 @@ from this project so far ive learned that the webpage sends a http request in th
 
 
 
-##How to Set it up in your computer:
-
-
+<h3>How to Set it up in your computer:</h3>
 
 1. make sure you have a MYSQL database server
 2. create a schema called 'wage_calc' (not including the quotes)
-3. use this command to create the table 
+3. use this SQL command to create the table 
 
-CREATE TABLE `accounts` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `first_name` varchar(45) DEFAULT NULL,
-  `last_name` varchar(45) DEFAULT NULL,
-  `username` varchar(45) NOT NULL,
-  `email` varchar(90) DEFAULT NULL,
-  `password` varchar(90) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username_UNIQUE` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    CREATE TABLE `accounts` (
+      `id` int NOT NULL AUTO_INCREMENT,
+      `first_name` varchar(45) DEFAULT NULL,
+      `last_name` varchar(45) DEFAULT NULL,
+      `username` varchar(45) NOT NULL,
+      `email` varchar(90) DEFAULT NULL,
+      `password` varchar(90) NOT NULL,
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `username_UNIQUE` (`username`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 4. create a .env file in the root directory of the project within that provide it with the info to your database in such format
 
-MYSQL_HOST='127.0.0.1'
-MYSQL_USER='yourUsername'
-MYSQL_PASSWORD='yourPassword'
-MYSQL_DATABASE='wage_calc'
+    MYSQL_HOST='127.0.0.1'
+    MYSQL_USER='yourUsername'
+    MYSQL_PASSWORD='yourPassword'
+    MYSQL_DATABASE='wage_calc'
 
 
 
