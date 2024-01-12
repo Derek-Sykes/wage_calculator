@@ -23,10 +23,10 @@ const redirectHome = (req, res, next) => {
 }
 
 
-function postJob(job){
+function postJob(req, job){
     // TODO make function actually post the job to the db
     console.log(job);
-    req.session.jobs.push(job)
+    req.session.jobs.unshift(job)
 }
 
 let emptyJob = {
@@ -204,6 +204,11 @@ Router.get('/bag', (req, res) => {
         const { user } = res.locals
         let jobs = req.session.jobs
         let job = (jobs.filter(job => job.selected))[0]
+        console.log(job)
+        if(!job){
+            job = emptyJob
+        }
+        console.log(job)
         res.status(201).render('time_to_bag', {
             page: 'Time to bag', 
             userId: user.id, 
@@ -223,6 +228,7 @@ Router.get('/bag', (req, res) => {
             userId: '',
             answer: '',
             answer1: '',
+            job: emptyJob,
             hide1: 0,
             hide2: 1
         });
@@ -246,6 +252,8 @@ Router.post('/bag', (req, res) => {
     timeToBag.totalHours = answer.time
     
     console.log(answer)
+    let jobs = req.session.jobs
+    let job = (jobs.filter(job => job.selected))[0]
 
     try{
         const { user } = res.locals
@@ -259,6 +267,7 @@ Router.post('/bag', (req, res) => {
             username: user.username,
             answer: answer,
             answer1:'',
+            job: job,
             hide1: 1,
             hide2: 0
     });
@@ -268,6 +277,7 @@ Router.post('/bag', (req, res) => {
             userId: '',
             answer: answer,
             answer1: '',
+            job: emptyJob,
             hide1: 1,
             hide2: 0
         });
@@ -434,7 +444,7 @@ Router.post('/enter-job', redirectLogin, (req, res) => {
     // }
     // if they said save the job the it goes to db other wise it just goes to session list
     if(save) {
-        postJob(job)
+        postJob(req, job)
     }else{
         req.session.jobs.unshift(job)
         console.log(req.session.jobs)
