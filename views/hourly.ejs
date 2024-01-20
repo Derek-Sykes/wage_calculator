@@ -30,7 +30,7 @@
 		</label>
 		<input type="text" name="days" id="days" hidden /><br />
 		<input type="submit" id="submit" /><br />
-		<% if (userId && job) { %>
+		<% if (userId && job.name) { %>
 		<label for="prefill">Click to prefill boxes based on current job: </label
 		><br />
 		<input type="checkbox" name="prefill" id="prefill" />
@@ -55,7 +55,7 @@
 		let timePeriodEl = document.getElementById("timePeriod");
 		let timePeriodlEl = document.getElementById("timePeriodl");
 
-		if ("<%= userId %>" && "<%= job %>") {
+		if ("<%= userId %>" && "<%= job.name %>") {
 			let prefillEl = document.getElementById("prefill");
 			prefillEl.addEventListener("click", function () {
 				if (prefillEl.checked) {

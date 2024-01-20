@@ -1,76 +1,80 @@
 <main class="center">
-    <form action="/modify" method="post" id="ejf">
-        <label id="namel" for="name">Job title: </label>
-        <input type="text" name="name" id="name"><br>
-        <label for="frequency">How often do you recieve a check?: </label>
-        <select id="frequency" name="frequency" required>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="bi-weekly" selected>Bi-Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select><br>
-        <label id="taxl" for="tax">How much gets taken out for taxes?: </label>
-        <input type="text" name="tax" id="tax"><br>
-        <label for="payRate">What is your advertised pay?: </label>
-        <input type="text" name="payRate" id="payRate" required><br>
-        <label for="isHourly">Are you paid Hourly or salery?: </label>
-        <select id="isHourly" name="isHourly" required>
-            <option value="salary">Salary</option>
-            <option value="hourly">Hourly</option>
-        </select><br>
-        <label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
-        <input type="text" name="hours" id="hours" hidden><br>
-        <label id="daysl" for="days" hidden>How many days do you work a week?: </label>
-        <input type="text" name="days" id="days" hidden><br>
-        <input type="hidden" name="jobId" id="jobId" value="<%= job.id %>">
-        <input type="submit" id="submit">
-    </form>
+	<form action="/modify" method="post" id="ejf">
+		<label id="namel" for="name">Job title: </label>
+		<input type="text" name="name" id="name" /><br />
+		<label for="frequency">How often do you recieve a check?: </label>
+		<select id="frequency" name="frequency" required>
+			<option value="daily">Daily</option>
+			<option value="weekly">Weekly</option>
+			<option value="bi-weekly" selected>Bi-Weekly</option>
+			<option value="monthly">Monthly</option>
+			<option value="yearly">Yearly</option></select
+		><br />
+		<label id="taxl" for="tax">How much gets taken out for taxes?: </label>
+		<input type="text" name="tax" id="tax" /><br />
+		<label for="payRate">What is your advertised pay?: </label>
+		<input type="text" name="payRate" id="payRate" required /><br />
+		<label for="isHourly">Are you paid Hourly or salary?: </label>
+		<select id="isHourly" name="isHourly" required>
+			<option value="salary">Salary</option>
+			<option value="hourly">Hourly</option></select
+		><br />
+		<label id="hoursl" for="hours" hidden
+			>How many hours do you work a week?:
+		</label>
+		<input type="text" name="hours" id="hours" hidden /><br />
+		<label id="daysl" for="days" hidden
+			>How many days do you work a week?:
+		</label>
+		<input type="text" name="days" id="days" hidden /><br />
+		<input type="hidden" name="jobId" id="jobId" value="<%= job.id %>" />
+		<input type="submit" id="submit" />
+	</form>
 
-        <script>
-            let isHourlyEl = document.getElementById("isHourly")
-            let hoursEl = document.getElementById("hours")
-            let hourslEl = document.getElementById("hoursl")
-            let daysEl = document.getElementById("days")
-            let dayslEl = document.getElementById("daysl")
+	<script>
+		let isHourlyEl = document.getElementById("isHourly");
+		let hoursEl = document.getElementById("hours");
+		let hourslEl = document.getElementById("hoursl");
+		let daysEl = document.getElementById("days");
+		let dayslEl = document.getElementById("daysl");
 
-            window.onload = function(){
-                document.getElementById('name').value = '<%= job.name %>'
-                document.getElementById('frequency').value = '<%= job.frequency %>'
-                document.getElementById('tax').value = '<%= job.tax %>'
-                document.getElementById('payRate').value = '<%= job.payRate %>'
-                document.getElementById('isHourly').value = '<%= job.isHourly %>'.toLowerCase()
-                document.getElementById('hours').value = '<%= job.hours %>'
-                document.getElementById('days').value = '<%= job.days %>'
-                if(isHourlyEl.value == "hourly") {
-                    hoursEl.hidden = false;
-                    hourslEl.hidden = false;
-                    daysEl.hidden = false;
-                    dayslEl.hidden = false;
-                }else{
-                    hoursEl.hidden = true;
-                    hourslEl.hidden = true;
-                    daysEl.hidden = true;
-                    dayslEl.hidden = true;
-                    hoursEl.value = "";
-                    daysEl.value = ""
-                }
-            }
-            isHourlyEl.onchange = function() {
-                if(isHourlyEl.value == "hourly") {
-                    hoursEl.hidden = false;
-                    hourslEl.hidden = false;
-                    daysEl.hidden = false;
-                    dayslEl.hidden = false;
-                }else{
-                    hoursEl.hidden = true;
-                    hourslEl.hidden = true;
-                    daysEl.hidden = true;
-                    dayslEl.hidden = true;
-                    hoursEl.value = "";
-                    daysEl.value = ""
-                }
-
-            }
-        </script>
+		window.onload = function () {
+			document.getElementById("name").value = "<%= job.name %>";
+			document.getElementById("frequency").value = "<%= job.frequency %>";
+			document.getElementById("tax").value = "<%= job.tax %>";
+			document.getElementById("payRate").value = "<%= job.payRate %>";
+			document.getElementById("isHourly").value =
+				"<%= job.isHourly %>".toLowerCase();
+			document.getElementById("hours").value = "<%= job.hours %>";
+			document.getElementById("days").value = "<%= job.days %>";
+			if (isHourlyEl.value == "hourly") {
+				hoursEl.hidden = false;
+				hourslEl.hidden = false;
+				daysEl.hidden = false;
+				dayslEl.hidden = false;
+			} else {
+				hoursEl.hidden = true;
+				hourslEl.hidden = true;
+				daysEl.hidden = true;
+				dayslEl.hidden = true;
+				hoursEl.value = "";
+				daysEl.value = "";
+			}
+		};
+		isHourlyEl.onchange = function () {
+			if (isHourlyEl.value == "hourly") {
+				hoursEl.hidden = false;
+				hourslEl.hidden = false;
+				daysEl.hidden = false;
+				dayslEl.hidden = false;
+			} else {
+				hoursEl.hidden = true;
+				hourslEl.hidden = true;
+				daysEl.hidden = true;
+				dayslEl.hidden = true;
+				hoursEl.value = "";
+				daysEl.value = "";
+			}
+		};
+	</script>
 </main>

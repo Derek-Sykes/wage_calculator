@@ -1,123 +1,132 @@
 <main class="center">
-    <form action="/bag" method="post" id="bagf">
-        <label id="suml" for="sum">How much money do you want?: </label>
-        <input type="text" name="sum" id="sum" required><br>
-        <label id="taxl" for="tax">what rate do you expect to get taxed at?: </label>
-        <input type="text" name="tax" id="tax" required><br>
-        <label for="payRate">What is your advertised pay?: </label>
-        <input type="text" name="payRate" id="payRate" required><br>
-        <label for="isHourly">Are you paid Hourly or salery?: </label>
-        <select id="isHourly" name="isHourly" required>
-            <option value="salary">Salary</option>
-            <option value="hourly">Hourly</option>
-        </select><br>
-        <label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
-        <input type="text" name="hours" id="hours" hidden><br>
-        <label id="daysl" for="days" hidden>How many days do you work a week?: </label>
-        <input type="text" name="days" id="days" hidden><br>
-        <input type="submit" id="submit"><br>
-        <% if (userId && job) { %>
-            <label for="prefill">Click to prefill boxes based on current job: </label><br>
-            <input type="checkbox" name="prefill" id="prefill">
-        <% } %>
-    </form>
-    <div id="results">
-        <% if (answer) { %>
-            <p id="a">You need to work <%= answer.time %> hours to recieve $<%= answer.sum %>
-        <% } %>
-    </div>
-    <form action="/bag-time" method="post" id="bagTimef" hidden>
-        <label for="timePeriod">what time frame would you like to convert the hours to?: </label>
-        <select id="timePeriod" name="timePeriod" required>
-            <option value="days">Days</option>
-            <option value="weeks">Weeks</option>
-            <option value="months">Months</option>
-            <option value="years">Years</option>
-        </select><br>
-        <label id="monthl" for="month" hidden>Whats the year and month that you want to calculate for?: </label>
-        <input type="month" name="month" id="month" hidden><br>
-        <input type="submit" id="submitT">
-        
-    </form>
+	<form action="/bag" method="post" id="bagf">
+		<label id="suml" for="sum">How much money do you want?: </label>
+		<input type="text" name="sum" id="sum" required /><br />
+		<label id="taxl" for="tax"
+			>what rate do you expect to get taxed at?:
+		</label>
+		<input type="text" name="tax" id="tax" required /><br />
+		<label for="payRate">What is your advertised pay?: </label>
+		<input type="text" name="payRate" id="payRate" required /><br />
+		<label for="isHourly">Are you paid Hourly or salery?: </label>
+		<select id="isHourly" name="isHourly" required>
+			<option value="salary">Salary</option>
+			<option value="hourly">Hourly</option></select
+		><br />
+		<label id="hoursl" for="hours" hidden
+			>How many hours do you work a week?:
+		</label>
+		<input type="text" name="hours" id="hours" hidden /><br />
+		<label id="daysl" for="days" hidden
+			>How many days do you work a week?:
+		</label>
+		<input type="text" name="days" id="days" hidden /><br />
+		<input type="submit" id="submit" /><br />
+		<% if (userId && job.name) { %>
+		<label for="prefill">Click to prefill boxes based on current job: </label
+		><br />
+		<input type="checkbox" name="prefill" id="prefill" />
+		<% } %>
+	</form>
+	<div id="results">
+		<% if (answer) { %>
+		<p id="a">
+			You need to work <%= answer.time %> hours to recieve $<%= answer.sum %> <%
+			} %>
+		</p>
+	</div>
 
-    <% if (answer1) { %>
-        <p id="a1">You need to work <%= answer1.time %> <%= answer1.timePeriod %> to recieve $<%= answer1.sum %></p> <br>
-        <a href="/bag">Enter new calculation</a>
-    <% } %>
-    
-    
-    <script>
-        let isHourlyEl = document.getElementById("isHourly")
-        let hoursEl = document.getElementById("hours")
-        let hourslEl = document.getElementById("hoursl")
-        let daysEl = document.getElementById("days")
-        let dayslEl = document.getElementById("daysl")
-        let timePeriodEl = document.getElementById("timePeriod")
-        let timePeriodlEl=document.getElementById("timePeriodl")
-        let monthEl = document.getElementById("month")
-        let monthlEl=document.getElementById("monthl")
-        let bagTimefEl=document.getElementById("bagTimef")
-        let bagfEl=document.getElementById("bagf")
-        let submitEl=document.getElementById("submit")
-        let submitTEl=document.getElementById("submitT")
+	<form action="/bag-time" method="post" id="bagTimef" hidden>
+		<label for="timePeriod"
+			>what time frame would you like to convert the hours to?:
+		</label>
+		<select id="timePeriod" name="timePeriod" required>
+			<option value="days">Days</option>
+			<option value="weeks">Weeks</option>
+			<option value="months">Months</option>
+			<option value="years">Years</option></select
+		><br />
+		<label id="monthl" for="month" hidden
+			>Whats the year and month that you want to calculate for?:
+		</label>
+		<input type="month" name="month" id="month" hidden /><br />
+		<input type="submit" id="submitT" />
+	</form>
 
-        
-        
+	<% if (answer1) { %>
+	<p id="a1">
+		You need to work <%= answer1.time %> <%= answer1.timePeriod %> to recieve
+		$<%= answer1.sum %>
+	</p>
+	<br />
+	<a href="/bag">Enter new calculation</a>
+	<% } %>
 
-        isHourlyEl.onchange = function() {
-            if(isHourlyEl.value == "hourly") {
-                hoursEl.hidden = false;
-                hourslEl.hidden = false;
-                daysEl.hidden = false;
-                dayslEl.hidden = false;
-            }else{
-                hoursEl.hidden = true;
-                hourslEl.hidden = true;
-                daysEl.hidden = true;
-                dayslEl.hidden = true;
-            }
+	<script>
+		let isHourlyEl = document.getElementById("isHourly");
+		let hoursEl = document.getElementById("hours");
+		let hourslEl = document.getElementById("hoursl");
+		let daysEl = document.getElementById("days");
+		let dayslEl = document.getElementById("daysl");
+		let timePeriodEl = document.getElementById("timePeriod");
+		let timePeriodlEl = document.getElementById("timePeriodl");
+		let monthEl = document.getElementById("month");
+		let monthlEl = document.getElementById("monthl");
+		let bagTimefEl = document.getElementById("bagTimef");
+		let bagfEl = document.getElementById("bagf");
+		let submitEl = document.getElementById("submit");
+		let submitTEl = document.getElementById("submitT");
 
-        }
+		isHourlyEl.onchange = function () {
+			if (isHourlyEl.value == "hourly") {
+				hoursEl.hidden = false;
+				hourslEl.hidden = false;
+				daysEl.hidden = false;
+				dayslEl.hidden = false;
+			} else {
+				hoursEl.hidden = true;
+				hourslEl.hidden = true;
+				daysEl.hidden = true;
+				dayslEl.hidden = true;
+			}
+		};
 
-        timePeriodEl.onchange = function(){
-            if(timePeriodEl.value === 'months'){
-                monthlEl.hidden = false
-                monthEl.hidden = false
-            }else{
-                monthlEl.hidden = true
-                monthEl.hidden = true
-            }
-        } 
-        window.onload = function(){
-            bagfEl.hidden = !!parseInt('<%= hide1 %>')
-            bagTimefEl.hidden = !!parseInt('<%= hide2 %>')
-            console.log('value: ','<%= hide1 %>')
-            console.log('value: ', bagfEl.hidden)
-        }
-        
+		timePeriodEl.onchange = function () {
+			if (timePeriodEl.value === "months") {
+				monthlEl.hidden = false;
+				monthEl.hidden = false;
+			} else {
+				monthlEl.hidden = true;
+				monthEl.hidden = true;
+			}
+		};
+		window.onload = function () {
+			bagfEl.hidden = !!parseInt("<%= hide1 %>");
+			bagTimefEl.hidden = !!parseInt("<%= hide2 %>");
+			console.log("value: ", "<%= hide1 %>");
+			console.log("value: ", bagfEl.hidden);
+		};
 
-        if ('<%= userId %>' && '<%= job %>') {
-            let prefillEl = document.getElementById('prefill')
-            prefillEl.addEventListener('click', function(){
-                if(prefillEl.checked){
-                    document.getElementById('tax').value = '<%= job.tax %>'
-                    document.getElementById('payRate').value = '<%= job.payRate %>'
-                    isHourlyEl.value = '<%= job.isHourly %>'.toLowerCase()
-                    isHourlyEl.dispatchEvent(new Event("change"))
-                    document.getElementById("hours").value = '<%= job.hours %>'
-                    document.getElementById("days").value = '<%= job.days %>'
-                }else{
-                    document.getElementById('sum').value = ''
-                    document.getElementById('tax').value = ''
-                    document.getElementById('payRate').value = ''
-                    isHourlyEl.value = 'salary'
-                    isHourlyEl.dispatchEvent(new Event("change"))
-                    document.getElementById("hours").value = ''
-                    document.getElementById("days").value = ''
-                }
-            })
-        }
-        
-
-    </script>
+		if ("<%= userId %>" && "<%= job.name %>") {
+			let prefillEl = document.getElementById("prefill");
+			prefillEl.addEventListener("click", function () {
+				if (prefillEl.checked) {
+					document.getElementById("tax").value = "<%= job.tax %>";
+					document.getElementById("payRate").value = "<%= job.payRate %>";
+					isHourlyEl.value = "<%= job.isHourly %>".toLowerCase();
+					isHourlyEl.dispatchEvent(new Event("change"));
+					document.getElementById("hours").value = "<%= job.hours %>";
+					document.getElementById("days").value = "<%= job.days %>";
+				} else {
+					document.getElementById("sum").value = "";
+					document.getElementById("tax").value = "";
+					document.getElementById("payRate").value = "";
+					isHourlyEl.value = "salary";
+					isHourlyEl.dispatchEvent(new Event("change"));
+					document.getElementById("hours").value = "";
+					document.getElementById("days").value = "";
+				}
+			});
+		}
+	</script>
 </main>
