@@ -5,6 +5,8 @@
 
 // allow user to modify account info
 
+// update README
+
 import express from "express";
 const Router = express.Router();
 import Tax from "../controllers/tax.js";
@@ -36,6 +38,13 @@ function postJob(req, job) {
 	req.session.jobs.unshift(job);
 }
 
+function removeChar(string, char) {
+	if (string.includes(char)) {
+		return string.replace(char, "");
+	}
+	return string;
+}
+
 let emptyJob = {
 	name: "",
 	frequency: "",
@@ -47,128 +56,42 @@ let emptyJob = {
 	id: "",
 	selected: false,
 };
-
-// main
-Router.get("/", (req, res) => {
-	try {
-		const { user } = res.locals;
-		res.status(201).render("home", {
-			page: "Home",
+// get user and page info
+function getUserInfo(user, pageName) {
+	if (user) {
+		return {
+			page: pageName,
 			userId: user.id,
 			first_name: user.first_name,
 			last_name: user.last_name,
 			email: user.email,
 			username: user.username,
-		});
-	} catch {
-		res.status(201).render("home", {
-			page: "Welcome",
+		};
+	} else {
+		return {
+			page: pageName,
 			userId: "",
-		});
+		};
 	}
-});
-//home get
-Router.get("/home", redirectLogin, (req, res) => {
-	const { user } = res.locals;
-	res.status(201).render("home", {
-		page: "Home",
-		userId: user.id,
-		first_name: user.first_name,
-		last_name: user.last_name,
-		email: user.email,
-		username: user.username,
-		jobs: req.session.jobs,
-	});
-});
+}
 
-//tax get
-Router.get("/tax", (req, res) => {
-	try {
-		const { user } = res.locals;
-		let jobs = req.session.jobs;
-		let job = jobs.filter((job) => job.selected)[0];
-		res.status(201).render("tax", {
-			page: "Tax",
-			userId: user.id,
-			first_name: user.first_name,
-			last_name: user.last_name,
-			email: user.email,
-			username: user.username,
-			answer: "",
-			job: job,
-		});
-	} catch {
-		res.status(201).render("tax", {
-			page: "Tax",
-			userId: "",
-			answer: "",
-			job: emptyJob,
-		});
-	}
-});
+function jobSelected(jobs) {
+	return jobs.filter((job) => job.selected)[0];
+}
 
-Router.post("/tax", (req, res) => {
-	const { frequency, timePeriod, check, payRate, isHourly, hours } = req.body;
+function calcTax(frequency, timePeriod, check, payRate, isHourly, hours) {
 	console.log(frequency, timePeriod, check, payRate, isHourly, hours);
 	let [year, month] = timePeriod.split("-") || null;
 	let tax = new Tax(frequency, check, payRate, isHourly, hours);
 	console.log(tax);
-
 	let answer = tax.calculateTax(month, year);
 	console.log(answer);
 	answer = (100 - answer * 100).toFixed(1);
-
-	try {
-		const { user } = res.locals;
-		let jobs = req.session.jobs;
-		let job = jobs.filter((job) => job.selected)[0];
-
-		res.status(201).render("tax", {
-			page: "tax",
-			answer: answer,
-			userId: user.id,
-			job: job,
-		});
-	} catch {
-		res.status(201).render("tax", {
-			page: "tax",
-			answer: answer,
-			userId: "",
-			job: emptyJob,
-		});
-	}
-});
-
-Router.get("/predict", (req, res) => {
-	try {
-		const { user } = res.locals;
-		let jobs = req.session.jobs;
-		let job = jobs.filter((job) => job.selected)[0] || "";
-		res.status(201).render("predict_check", {
-			page: "Predict Check",
-			userId: user.id,
-			first_name: user.first_name,
-			last_name: user.last_name,
-			email: user.email,
-			username: user.username,
-			job: job,
-			answer: "",
-		});
-	} catch {
-		res.status(201).render("predict_check", {
-			page: "Predict Check",
-			userId: "",
-			job: "",
-			answer: "",
-		});
-	}
-});
-
-Router.post("/predict", (req, res) => {
-	let { frequency, timePeriod, tax, payRate, isHourly, hours, days } = req.body;
-	if (tax.includes("%")) {
-		tax = tax.replace("%", "");
-	}
+	return answer;
+}
+function calcPredict(frequency, timePeriod, tax, payRate, isHourly, hours, days) {
+	tax = removeChar(tax, "%");
+	payRate = removeChar(payRate, ",");
 	tax = Math.abs(parseFloat(tax) / 100 - 1);
 	console.log(frequency, tax, payRate, isHourly, hours, days);
 	let [year, month] = timePeriod.split("-") || null;
@@ -177,6 +100,87 @@ Router.post("/predict", (req, res) => {
 
 	let answer = predict.calculatePredict(month, year).toFixed(2);
 	console.log(answer);
+}
+
+// main
+Router.get("/", (req, res) => {
+	try {
+		const { user } = res.locals;
+		res.status(201).render("home", getUserInfo(user, "Home"));
+	} catch {
+		res.status(201).render("home", getUserInfo("", "Welcome"));
+	}
+});
+//home get
+Router.get("/home", redirectLogin, (req, res) => {
+	const { user } = res.locals;
+	res.status(201).render("home", {
+		...getUserInfo(user, "Home"),
+		jobs: req.session.jobs,
+	});
+});
+
+//tax get
+Router.get("/tax", (req, res) => {
+	try {
+		const { user } = res.locals;
+		let job = jobSelected(req.session.jobs);
+		res.status(201).render("tax", {
+			...getUserInfo(user, "Tax"),
+			answer: "",
+			job: job,
+		});
+	} catch {
+		res.status(201).render("tax", {
+			...getUserInfo("", "Tax"),
+			answer: "",
+			job: emptyJob,
+		});
+	}
+});
+
+Router.post("/tax", (req, res) => {
+	const { frequency, timePeriod, check, payRate, isHourly, hours } = req.body;
+	let answer = calcTax(frequency, timePeriod, check, payRate, isHourly, hours);
+	try {
+		const { user } = res.locals;
+		let job = jobSelected(req.session.jobs);
+
+		res.status(201).render("tax", {
+			...getUserInfo(user, "Tax"),
+			answer: answer,
+			job: job,
+		});
+	} catch {
+		res.status(201).render("tax", {
+			...getUserInfo("", "Tax"),
+			answer: answer,
+			job: emptyJob,
+		});
+	}
+});
+
+Router.get("/predict", (req, res) => {
+	try {
+		const { user } = res.locals;
+		let job = jobSelected(req.session.jobs);
+		res.status(201).render("predict_check", {
+			...getUserInfo(user, "Predict Check"),
+			job: job,
+			answer: "",
+		});
+	} catch {
+		res.status(201).render("predict_check", {
+			...getUserInfo("", "Predict Check"),
+			job: emptyJob,
+			answer: "",
+		});
+	}
+});
+
+Router.post("/predict", (req, res) => {
+	let { frequency, timePeriod, tax, payRate, isHourly, hours, days } = req.body;
+	calcPredict(frequency, timePeriod, tax, payRate, isHourly, hours, days);
 
 	// answer = (100-(answer*100)).toFixed(1)
 	try {
@@ -184,17 +188,15 @@ Router.post("/predict", (req, res) => {
 		let jobs = req.session.jobs;
 		let job = jobs.filter((job) => job.selected)[0] || "";
 		res.status(201).render("predict_check", {
-			page: "Predict Check",
+			...getUserInfo(user, "Predict Check"),
 			answer: answer,
 			job: job,
-			userId: user.id,
 		});
 	} catch {
 		res.status(201).render("predict_check", {
-			page: "Predict Check",
+			...getUserInfo("", "Predict Check"),
 			answer: answer,
 			job: "",
-			userId: "",
 		});
 	}
 });
@@ -204,18 +206,11 @@ Router.get("/bag", (req, res) => {
 		const { user } = res.locals;
 		let jobs = req.session.jobs;
 		let job = jobs.filter((job) => job.selected)[0];
-		console.log(job);
 		if (!job) {
 			job = emptyJob;
 		}
-		console.log(job);
 		res.status(201).render("time_to_bag", {
-			page: "Time to bag",
-			userId: user.id,
-			first_name: user.first_name,
-			last_name: user.last_name,
-			email: user.email,
-			username: user.username,
+			...getUserInfo(user, "Time to Bag"),
 			answer: "",
 			answer1: "",
 			job: job,
@@ -224,8 +219,7 @@ Router.get("/bag", (req, res) => {
 		});
 	} catch {
 		res.status(201).render("time_to_bag", {
-			page: "Time to bag",
-			userId: "",
+			...getUserInfo("", "Time to Bag"),
 			answer: "",
 			answer1: "",
 			job: emptyJob,
@@ -257,12 +251,7 @@ Router.post("/bag", (req, res) => {
 		const { user } = res.locals;
 
 		res.status(201).render("time_to_bag", {
-			page: "Time to bag",
-			userId: user.id,
-			first_name: user.first_name,
-			last_name: user.last_name,
-			email: user.email,
-			username: user.username,
+			...getUserInfo(user, "Time to Bag"),
 			answer: answer,
 			answer1: "",
 			job: emptyJob,
@@ -271,8 +260,7 @@ Router.post("/bag", (req, res) => {
 		});
 	} catch {
 		res.status(201).render("time_to_bag", {
-			page: "Time to bag",
-			userId: "",
+			...getUserInfo("", "Time to Bag"),
 			answer: answer,
 			answer1: "",
 			job: emptyJob,
@@ -290,9 +278,7 @@ Router.post("/bag-time", (req, res) => {
 	let answer1 = {};
 	if (month) {
 		[year, month1] = month.split("-") || [null, null];
-		answer1.time = timeToBag
-			.convertToTimePeriod(timePeriod, month1, year)
-			.toFixed(2);
+		answer1.time = timeToBag.convertToTimePeriod(timePeriod, month1, year).toFixed(2);
 	} else {
 		console.log(timePeriod);
 		answer1.time = timeToBag.convertToTimePeriod(timePeriod).toFixed(2);
@@ -309,12 +295,7 @@ Router.post("/bag-time", (req, res) => {
 		const { user } = res.locals;
 
 		res.status(201).render("time_to_bag", {
-			page: "Time to bag",
-			userId: user.id,
-			first_name: user.first_name,
-			last_name: user.last_name,
-			email: user.email,
-			username: user.username,
+			...getUserInfo(user, "Time to Bag"),
 			answer1: answer1,
 			answer: "",
 			job: emptyJob,
@@ -323,8 +304,7 @@ Router.post("/bag-time", (req, res) => {
 		});
 	} catch {
 		res.status(201).render("time_to_bag", {
-			page: "Time to bag",
-			userId: "",
+			...getUserInfo("", "Time to Bag"),
 			answer1: answer1,
 			job: emptyJob,
 			answer: "",
@@ -343,19 +323,13 @@ Router.get("/hourly", (req, res) => {
 			job = emptyJob;
 		}
 		res.status(201).render("hourly", {
-			page: "Hourly",
-			userId: user.id,
-			first_name: user.first_name,
-			last_name: user.last_name,
-			email: user.email,
-			username: user.username,
+			...getUserInfo(user, "Hourly"),
 			job: job,
 			answer: "",
 		});
 	} catch {
 		res.status(201).render("hourly", {
-			page: "Hourly",
-			userId: "",
+			...getUserInfo(user, "Hourly"),
 			job: emptyJob,
 			answer: "",
 		});
@@ -388,17 +362,15 @@ Router.post("/hourly", (req, res) => {
 	try {
 		const { user } = res.locals;
 		res.status(201).render("hourly", {
-			page: "hourly",
+			...getUserInfo(user, "Hourly"),
 			answer: answer,
 			job: job,
-			userId: user.id,
 		});
 	} catch {
 		res.status(201).render("hourly", {
-			page: "hourly",
+			...getUserInfo("", "Hourly"),
 			answer: answer,
 			job: emptyJob,
-			userId: "",
 		});
 	}
 });
@@ -407,12 +379,7 @@ Router.get("/enter-job", redirectLogin, (req, res) => {
 	try {
 		const { user } = res.locals;
 		res.status(201).render("enter-job", {
-			page: "Enter Job",
-			userId: user.id,
-			first_name: user.first_name,
-			last_name: user.last_name,
-			email: user.email,
-			username: user.username,
+			...getUserInfo(user, "Enter Job"),
 		});
 		console.log(req.session.jobs);
 	} catch {
@@ -464,24 +431,31 @@ Router.get("/jobs", redirectLogin, (req, res) => {
 	try {
 		const { user } = res.locals;
 		let jobs = req.session.jobs;
+		//translateIsHourlyString  function
 		jobs.forEach((job) => {
-			job.isHourly = job.isHourly ? "Hourly" : "Salary";
+			if (job.isHourly === true) {
+				job.isHourly = "Hourly";
+			} else if (job.isHourly === false) {
+				job.isHourly = "Salary";
+			}
 		});
 
 		res.status(201).render("jobs", {
-			page: "Jobs",
-			userId: user.id,
-			first_name: user.first_name,
-			last_name: user.last_name,
-			email: user.email,
-			username: user.username,
+			...getUserInfo(user, "Jobs"),
 			jobs: jobs,
+		});
+		jobs.forEach((job) => {
+			if (job.isHourly === "Hourly") {
+				job.isHourly = true;
+			} else if (job.isHourly === "Salary") {
+				job.isHourly = false;
+			}
 		});
 	} catch {
 		res.status(201).render("error");
 	}
 });
-
+// handles selected
 Router.post("/jobs", redirectLogin, (req, res) => {
 	const { user } = res.locals;
 	let jobs = req.session.jobs;
@@ -519,17 +493,21 @@ Router.get("/modify", redirectLogin, (req, res) => {
 		const jobId = req.query.jobId;
 		let jobs = req.session.jobs;
 		let job = jobs.filter((job) => job.id == jobId)[0];
-		job.isHourly = job.isHourly ? "Hourly" : "Salary";
+		if (job.isHourly === true) {
+			job.isHourly = "Hourly";
+		} else if (job.isHourly === false) {
+			job.isHourly = "Salary";
+		}
 		console.log(job.id);
 		res.status(201).render("modify-job", {
-			page: "Modify Job",
-			userId: user.id,
-			first_name: user.first_name,
-			last_name: user.last_name,
-			email: user.email,
-			username: user.username,
+			...getUserInfo(user, "Modify Job"),
 			job: job,
 		});
+		if (job.isHourly === "Hourly") {
+			job.isHourly = true;
+		} else if (job.isHourly === "Salary") {
+			job.isHourly = false;
+		}
 	} catch {
 		res.status(201).render("error");
 	}
@@ -538,8 +516,7 @@ Router.get("/modify", redirectLogin, (req, res) => {
 Router.post("/modify", redirectLogin, (req, res) => {
 	const { user } = res.locals;
 	let jobs = req.session.jobs;
-	let { jobId, frequency, tax, payRate, isHourly, hours, days, name } =
-		req.body;
+	let { jobId, frequency, tax, payRate, isHourly, hours, days, name } = req.body;
 	isHourly = isHourly == "hourly";
 	isHourly = isHourly ? "Hourly" : "Salary";
 	console.log(jobId, frequency, tax, payRate, isHourly, hours, days);

@@ -115,7 +115,7 @@ export async function getJobsFromDB(id) {
 			id,
 		]);
 		for (let row of rows) {
-			row.isHourly ? (row.isHourly = true) : (row.isHourly = false);
+			row.is_hourly ? (row.is_hourly = true) : (row.is_hourly = false);
 			let job = {
 				name: row.title,
 				frequency: row.pay_frequency,

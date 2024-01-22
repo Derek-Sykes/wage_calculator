@@ -1,3 +1,7 @@
+let array = [];
+let elem = array[0] || "h";
+console.log("Elem: ", elem);
+
 // let frequencyEl = document.getElementById("frequency")
 // let checkEl = document.getElementById("check")
 // let payRateEl = document.getElementById("payRate")
@@ -15,7 +19,7 @@
 // let baseurl = "localhost:8484/"
 // async function postInfo(frequency, check, payRate, isHourly, hours=0){
 //     //e.preventDefault();
-//     const res = await fetch(baseurl + 'tax', 
+//     const res = await fetch(baseurl + 'tax',
 //     {
 //         method:'POST',
 //         headers: {
@@ -27,7 +31,7 @@
 //             payRate: payRate,
 //             isHourly: isHourly,
 //             hours: hours,
-//             timePeriod: timePeriod         
+//             timePeriod: timePeriod
 //         })
 //     });
 // }
@@ -52,7 +56,7 @@
 //                     document.getElementById("paragraph"+Job.id).replaceWith(document.getElementById("select"+job.id))
 //                 }
 //             }
-            
+
 //         })
 //     }
 // }
