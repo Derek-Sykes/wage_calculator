@@ -35,13 +35,7 @@ export async function getUser(username) {
 	return rows[0];
 }
 
-export async function createUser(
-	first_name,
-	last_name,
-	username,
-	email,
-	password
-) {
+export async function createUser(first_name, last_name, username, email, password) {
 	if (typeof (await getUser(username)) == "undefined") {
 		const [result] = await pool.query(
 			`
@@ -60,14 +54,7 @@ export async function createUser(
 	}
 }
 
-export async function updateUser(
-	id,
-	first_name,
-	last_name,
-	username,
-	email,
-	password
-) {
+export async function updateUser(id, first_name, last_name, username, email, password) {
 	const [rows] = await pool.query(
 		`
         UPDATE accounts
@@ -111,9 +98,7 @@ export async function postJobToDB(job, userId) {
 export async function getJobsFromDB(id) {
 	let jobs = [];
 	try {
-		const [rows] = await pool.query(`SELECT * FROM jobs WHERE user_id = ?`, [
-			id,
-		]);
+		const [rows] = await pool.query(`SELECT * FROM jobs WHERE user_id = ?`, [id]);
 		for (let row of rows) {
 			row.is_hourly ? (row.is_hourly = true) : (row.is_hourly = false);
 			let job = {
@@ -132,6 +117,47 @@ export async function getJobsFromDB(id) {
 	} catch (e) {
 		console.log(`ERROR: ${e}`);
 	}
-	console.log(jobs);
 	return jobs;
+}
+
+export async function modifyJob(job) {
+	let { name, frequency, tax, payRate, isHourly, hours, days, id } = job;
+	isHourly == true || isHourly == "Hourly" ? (isHourly = 1) : (isHourly = 0);
+	hours = !hours ? null : hours;
+	days = !days ? null : days;
+	const [result] = await pool.query(
+		`
+		UPDATE jobs
+		SET title = ?,
+			pay_frequency = ?,
+			tax = ?, 
+			pay_rate = ?,
+			is_hourly = ?,
+			hours = ?,
+			days = ? 
+		WHERE job_id = ?;
+    `,
+		[name, frequency, tax, payRate, isHourly, hours, days, id]
+	);
+}
+
+export async function deleteJob(id, userId) {
+	let user_id;
+	try {
+		const [rows] = await pool.query(`SELECT * FROM jobs WHERE job_id = ?`, [id]);
+		if (rows[0]) {
+			user_id = rows[0].user_id;
+		}
+		if (userId == user_id) {
+			const [result] = await pool.query(
+				`
+				DELETE FROM jobs
+				WHERE job_id = ?;
+			`,
+				[id]
+			);
+		}
+	} catch (e) {
+		console.log("ERROR: ", e);
+	}
 }

@@ -21,26 +21,19 @@
 			<option value="salary">Salary</option>
 			<option value="hourly">Hourly</option></select
 		><br />
-		<label id="hoursl" for="hours" hidden
-			>How many hours do you work a week?:
-		</label>
+		<label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
 		<input type="text" name="hours" id="hours" hidden /><br />
-		<label id="daysl" for="days" hidden
-			>How many days do you work a week?:
-		</label>
+		<label id="daysl" for="days" hidden>How many days do you work a week?: </label>
 		<input type="text" name="days" id="days" hidden /><br />
 		<input type="submit" id="submit" /><br />
 		<% if (userId && job.name) { %>
-		<label for="prefill">Click to prefill boxes based on current job: </label
-		><br />
+		<label for="prefill">Click to prefill boxes based on current job: </label><br />
 		<input type="checkbox" name="prefill" id="prefill" />
 		<% } %>
 	</form>
 	<div id="results">
 		<% if (answer) { %>
-		<p id="a">
-			Your <%= answer.tax %> tax hourly rate is $<%= answer.rate %> <% } %>
-		</p>
+		<p id="a">Your <%= answer.tax %> tax hourly rate is $<%= answer.rate %> <% } %></p>
 	</div>
 
 	<script src="/public/wage.js"></script>
@@ -60,7 +53,7 @@
 			prefillEl.addEventListener("click", function () {
 				if (prefillEl.checked) {
 					document.getElementById("tax").value = "<%= job.tax %>";
-					isHourlyEl.value = "<%= job.isHourly %>".toLowerCase();
+					isHourlyEl.value = "<%= isHourly %>".toLowerCase();
 					isHourlyEl.dispatchEvent(new Event("change"));
 					document.getElementById("hours").value = "<%= job.hours %>";
 					document.getElementById("days").value = "<%= job.days %>";

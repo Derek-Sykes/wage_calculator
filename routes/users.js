@@ -1,13 +1,6 @@
 import express from "express";
 const Router = express.Router();
-import {
-	getUser,
-	createUser,
-	deleteUser,
-	updateUser,
-	getUsersJson,
-	getJobsFromDB,
-} from "../db.js";
+import { getUser, createUser, deleteUser, updateUser, getUsersJson, getJobsFromDB } from "../db.js";
 import bodyParser from "body-parser";
 import session from "express-session";
 import bcrypt from "bcrypt";
@@ -73,7 +66,6 @@ function isSecure(password) {
 	return password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password);
 }
 
-// TODO make function actually get the job from the db
 async function getJobs(id) {
 	let jobs = await getJobsFromDB(id);
 	return jobs;
@@ -83,7 +75,6 @@ async function getJobs(id) {
 
 Router.use((req, res, next) => {
 	const { userId } = req.session;
-	console.log(userId);
 	if (userId) {
 		res.locals.user = users.find((user) => user.id === userId);
 	}
@@ -147,9 +138,7 @@ Router.post("/register", redirectHome, async (req, res) => {
 	let message;
 
 	if (fname && lname && email && username && password) {
-		const exists = users.some(
-			(user) => user.username === username || user.email === email
-		);
+		const exists = users.some((user) => user.username === username || user.email === email);
 		// creates account
 		if (!exists && isSecure(password)) {
 			let user = await createUser(fname, lname, username, email, hash);

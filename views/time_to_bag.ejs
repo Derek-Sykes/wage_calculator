@@ -2,9 +2,7 @@
 	<form action="/bag" method="post" id="bagf">
 		<label id="suml" for="sum">How much money do you want?: </label>
 		<input type="text" name="sum" id="sum" required /><br />
-		<label id="taxl" for="tax"
-			>what rate do you expect to get taxed at?:
-		</label>
+		<label id="taxl" for="tax">what rate do you expect to get taxed at?: </label>
 		<input type="text" name="tax" id="tax" required /><br />
 		<label for="payRate">What is your advertised pay?: </label>
 		<input type="text" name="payRate" id="payRate" required /><br />
@@ -13,33 +11,23 @@
 			<option value="salary">Salary</option>
 			<option value="hourly">Hourly</option></select
 		><br />
-		<label id="hoursl" for="hours" hidden
-			>How many hours do you work a week?:
-		</label>
+		<label id="hoursl" for="hours" hidden>How many hours do you work a week?: </label>
 		<input type="text" name="hours" id="hours" hidden /><br />
-		<label id="daysl" for="days" hidden
-			>How many days do you work a week?:
-		</label>
+		<label id="daysl" for="days" hidden>How many days do you work a week?: </label>
 		<input type="text" name="days" id="days" hidden /><br />
 		<input type="submit" id="submit" /><br />
 		<% if (userId && job.name) { %>
-		<label for="prefill">Click to prefill boxes based on current job: </label
-		><br />
+		<label for="prefill">Click to prefill boxes based on current job: </label><br />
 		<input type="checkbox" name="prefill" id="prefill" />
 		<% } %>
 	</form>
 	<div id="results">
 		<% if (answer) { %>
-		<p id="a">
-			You need to work <%= answer.time %> hours to recieve $<%= answer.sum %> <%
-			} %>
-		</p>
+		<p id="a">You need to work <%= answer.time %> hours to recieve $<%= answer.sum %> <% } %></p>
 	</div>
 
 	<form action="/bag-time" method="post" id="bagTimef" hidden>
-		<label for="timePeriod"
-			>what time frame would you like to convert the hours to?:
-		</label>
+		<label for="timePeriod">what time frame would you like to convert the hours to?: </label>
 		<select id="timePeriod" name="timePeriod" required>
 			<option value="days">Days</option>
 			<option value="weeks">Weeks</option>
@@ -55,8 +43,7 @@
 
 	<% if (answer1) { %>
 	<p id="a1">
-		You need to work <%= answer1.time %> <%= answer1.timePeriod %> to recieve
-		$<%= answer1.sum %>
+		You need to work <%= answer1.time %> <%= answer1.timePeriod %> to recieve $<%= answer1.sum %>
 	</p>
 	<br />
 	<a href="/bag">Enter new calculation</a>
@@ -113,7 +100,7 @@
 				if (prefillEl.checked) {
 					document.getElementById("tax").value = "<%= job.tax %>";
 					document.getElementById("payRate").value = "<%= job.payRate %>";
-					isHourlyEl.value = "<%= job.isHourly %>".toLowerCase();
+					isHourlyEl.value = "<%= isHourly %>".toLowerCase();
 					isHourlyEl.dispatchEvent(new Event("change"));
 					document.getElementById("hours").value = "<%= job.hours %>";
 					document.getElementById("days").value = "<%= job.days %>";

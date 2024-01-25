@@ -1,6 +1,4 @@
-let array = [];
-let elem = array[0] || "h";
-console.log("Elem: ", elem);
+console.log(false === "hourly" || "salary");
 
 // let frequencyEl = document.getElementById("frequency")
 // let checkEl = document.getElementById("check")
