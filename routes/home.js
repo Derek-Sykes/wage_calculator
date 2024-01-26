@@ -1,6 +1,3 @@
-// add select as an attribute to the db so it remembers what was selected but everytime something new is selected
-// i have to unselect everything from db then select it if its from the db then i can make the connection
-
 // allow user to modify account info
 
 // update README
@@ -11,6 +8,9 @@ import Tax from "../controllers/tax.js";
 import Predict from "../controllers/predict_check.js";
 import TimeToBag from "../controllers/time_to_bag.js";
 import Hourly from "../controllers/hourly.js";
+import liveStockPrice from "live-stock-price";
+import axios from "axios";
+
 import {
 	postJobToDB,
 	getJobsFromDB,
@@ -103,6 +103,56 @@ function makeIsHourly(jobs) {
 		isHourly.unshift(translateIsHourly(job.isHourly));
 	});
 	return isHourly;
+}
+
+async function getStockPrice(stock) {
+	let price1 = "error";
+	await liveStockPrice(stock)
+		.then((price) => {
+			console.log("Stock price:", price);
+			price1 = price;
+		})
+		.catch((error) => {
+			console.error("Invalid tiker symbol");
+			price1 = "invalid";
+		});
+	return price1;
+}
+async function translateTiker(type, value) {
+	try {
+		let response;
+
+		if (type === "tkr") {
+			let ticker = value.toUpperCase();
+			let url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${ticker}&apikey=W0ETJ7YQC060L3EH`;
+			response = await axios.get(url);
+			console.log("response: ", response);
+		} else if (type === "name") {
+			let company = value;
+			let url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${company}&apikey=W0ETJ7YQC060L3EH`;
+			response = await axios.get(url);
+		} else {
+			throw new Error("Invalid type");
+		}
+
+		if (response.status !== 200) {
+			throw new Error(`Status ${response.status}`);
+		}
+
+		const data = response.data;
+		if (type === "tkr") {
+			let company = data.bestMatches[0]["2. name"];
+			console.log(company);
+			return company;
+		} else {
+			let ticker = data.bestMatches[0]["1. symbol"];
+			console.log(ticker);
+			return ticker;
+		}
+	} catch (error) {
+		console.error("Error:", error.message);
+		throw error;
+	}
 }
 
 // logic for calculator functions
@@ -586,6 +636,98 @@ Router.get("/unemployed", redirectLogin, async (req, res) => {
 		res.status(201).redirect("jobs");
 	} catch {
 		res.status(201).render("error");
+	}
+});
+
+Router.get("/stocks", redirectLogin, (req, res) => {
+	try {
+		const { user } = res.locals;
+		res.status(201).render("stocks", {
+			...getUserInfo(user, "stocks"),
+			price: "nothing",
+			stock: "nothing",
+		});
+	} catch {
+		res.status(201).render("error", { ...getUserInfo("", "stocks") });
+	}
+});
+
+Router.post("/stocks", redirectLogin, async (req, res) => {
+	try {
+		const { user } = res.locals;
+		let { stock, type } = req.body;
+		if (type === "name") {
+			stock = await translateTiker("name", stock);
+		} else if (type === "ticker") {
+			stock = stock.toUpperCase();
+		}
+
+		let price = await getStockPrice(stock);
+		res.status(201).render("stocks", {
+			...getUserInfo(user, "stocks"),
+			stock: stock,
+			page: "stocks",
+			price: price,
+		});
+	} catch (e) {
+		console.log(e);
+	}
+});
+
+Router.get("/buy-stocks", redirectLogin, async (req, res) => {
+	try {
+		const { user } = res.locals;
+		let stock = req.query.buy;
+		console.log("stock: ", stock);
+		let price = await getStockPrice(stock);
+		res.status(201).render("buy-stocks", {
+			...getUserInfo(user, "buy-stocks"),
+			price: price,
+			stock: stock,
+		});
+	} catch {
+		res.status(201).render("error", { ...getUserInfo("", "buy-stocks") });
+	}
+});
+
+Router.post("/buy-stocks", redirectLogin, async (req, res) => {
+	try {
+		const { user } = res.locals;
+		let { shares, stock } = req.body;
+		shares = parseInt(shares);
+		console.log("info: ", shares, stock);
+		let price = await getStockPrice(stock);
+		let cost = shares * price;
+		req.session.invest.cash -= cost;
+		let newstock = {
+			ticker: stock,
+			shares: shares,
+			price: price,
+		};
+		console.log(newstock);
+		req.session.invest.portfolio.unshift(newstock);
+		res.status(201).redirect("portfolio");
+	} catch (e) {
+		console.log(e);
+	}
+});
+
+Router.get("/portfolio", redirectLogin, async (req, res) => {
+	try {
+		const { user } = res.locals;
+		console.log("cash: ", req.session.invest.cash);
+		let portfolio = req.session.invest.portfolio || [];
+		let price = 0;
+		let cash = req.session.invest.cash;
+		res.status(201).render("portfolio", {
+			...getUserInfo(user, "Portfolio"),
+			price: price,
+			portfolio: portfolio,
+			cash: cash,
+		});
+	} catch (e) {
+		console.log(e);
+		res.status(201).render("error", { ...getUserInfo("", "portfolio") });
 	}
 });
 

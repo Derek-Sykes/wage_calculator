@@ -1,0 +1,18 @@
+<main class="center">
+	<form action="/stocks" method="post" id="ejf">
+		<h3>Live stock price search</h3>
+		<label id="typel" for="type">Search By: </label>
+		<select id="type" name="type" required>
+			<option value="ticker">Ticker</option>
+			<option value="name">Company</option>
+		</select>
+		<input type="text" name="stock" id="stock" /><br />
+		<input type="submit" id="submit" />
+	</form>
+	<p>The price of <%= stock %> is <%= price %></p>
+	<% if(stock!=='nothing' && stock!== 'invalid' && stock!== 'error'){ %>
+	<form action="/buy-stocks" method="get">
+		<button id="buy" value="<%= stock %>" name="buy">Buy</button>
+	</form>
+	<% } %>
+</main>

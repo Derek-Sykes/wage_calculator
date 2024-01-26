@@ -1,0 +1,28 @@
+<main class="center">
+	<h3>Portfolio</h3>
+	<br />
+    <h4>Your total cash balance is: <%= cash %></h4>
+	<% if(portfolio.length){ %>
+        <% for(stock of portfolio){ %>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Stock: <%= stock.ticker %></h5><br>
+                  
+                  <h6 class="card-subtitle mb-2 text-body-secondary">Stock details:</h6><hr>
+                  <!-- <p class="card-text">Company Name: <%= stock.name %></p> -->
+                  <p class="card-text">Purchase price: <%= stock.price %></p>
+                  <p class="card-text">Shares owned: <%= stock.shares %></p>
+                  
+                  <a href="/sell?jobId=<%= stock.ticker %>" class="card-link">Sell</a>
+                  <a href="/buy-stocks?jobId=<%= stock.ticker %>" class="card-link">Buy</a>
+                </div>
+              </div>
+            </div>
+        <% } %>
+    <% }else{ %>
+        <p class="center" style="margin-top:50px;">No stocks found</p>
+        <div class="container d-flex justify-content-center align-items-center">
+            <a href="/stocks" class="text-center">Buy Stock</a>
+          </div>
+    <% } %>
+</main>

@@ -121,6 +121,9 @@ Router.post("/login", redirectHome, async (req, res) => {
 		if (user && isMatch) {
 			req.session.userId = user.id;
 			req.session.jobs = await getJobs(user.id);
+			req.session.invest = { cash: 10000 };
+			req.session.invest.portfolio = [];
+			console.log(req.session.invest.cash);
 			return res.redirect("/home");
 		} else {
 			message = "Invalid Username or Password";
@@ -144,6 +147,7 @@ Router.post("/register", redirectHome, async (req, res) => {
 			let user = await createUser(fname, lname, username, email, hash);
 			req.session.userId = user.id;
 			updateDB();
+			req.session.invest.cash = 10000;
 			return res.redirect("/home");
 		} else if (exists) {
 			// account exists
