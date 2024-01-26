@@ -1,4 +1,8 @@
 // allow user to modify account info
+// find library that will translate stock symbol
+// make sell and buy more work
+// if you buy multiple of the same stock let the session combine them and average the price in retrospect to the amout of shares bought
+// eventually store these stocks in db tied to user. just like jobs.
 
 // update README
 
