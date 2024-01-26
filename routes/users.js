@@ -65,7 +65,7 @@ async function updateDB() {
 function isSecure(password) {
 	return password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password);
 }
-
+// jobs for the user that logged it
 async function getJobs(id) {
 	let jobs = await getJobsFromDB(id);
 	return jobs;

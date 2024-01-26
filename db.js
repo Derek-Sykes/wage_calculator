@@ -77,7 +77,7 @@ export async function deleteUser(id) {
 }
 
 export async function postJobToDB(job, userId) {
-	let { name, frequency, tax, payRate, isHourly, hours, days, id } = job;
+	let { name, frequency, tax, payRate, isHourly, hours, days, id, selected } = job;
 	isHourly == true || isHourly == "Hourly" ? (isHourly = 1) : (isHourly = 0);
 	const [rows] = await pool.query(`SELECT * FROM jobs`);
 	if (rows[rows.length - 1]) {
@@ -88,10 +88,10 @@ export async function postJobToDB(job, userId) {
 	days = !days ? null : days;
 	const [result] = await pool.query(
 		`
-    INSERT INTO jobs (job_id, title, pay_frequency, tax, pay_rate, is_hourly, hours, days, user_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO jobs (job_id, title, pay_frequency, tax, pay_rate, is_hourly, hours, days, user_id, selected)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
-		[id, name, frequency, tax, payRate, isHourly, hours, days, userId]
+		[id, name, frequency, tax, payRate, isHourly, hours, days, userId, selected]
 	);
 }
 
@@ -110,7 +110,7 @@ export async function getJobsFromDB(id) {
 				hours: row.hours,
 				days: row.days,
 				id: row.job_id,
-				selected: false,
+				selected: row.selected,
 			};
 			jobs.unshift(job);
 		}
@@ -157,6 +157,33 @@ export async function deleteJob(id, userId) {
 				[id]
 			);
 		}
+	} catch (e) {
+		console.log("ERROR: ", e);
+	}
+}
+
+export async function deselectJobs() {
+	try {
+		await pool.query(`
+		UPDATE jobs
+		SET selected = 0
+		WHERE selected = 1;
+		`);
+	} catch (e) {
+		console.log("ERROR: ", e);
+	}
+}
+
+export async function selectJob(jobId) {
+	try {
+		await pool.query(
+			`
+		UPDATE jobs
+		SET selected = 1
+		WHERE job_id = ?;
+		`,
+			[jobId]
+		);
 	} catch (e) {
 		console.log("ERROR: ", e);
 	}

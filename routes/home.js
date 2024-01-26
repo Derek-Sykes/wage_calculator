@@ -1,6 +1,3 @@
-// WHY IS JOBS ISHOURLY ELEMENT GETTING CHANGED (TRANSLATED WHEN THE JOBS ROUTE IS CALLED)
-// make modify and delete update the db
-
 // add select as an attribute to the db so it remembers what was selected but everytime something new is selected
 // i have to unselect everything from db then select it if its from the db then i can make the connection
 
@@ -14,7 +11,14 @@ import Tax from "../controllers/tax.js";
 import Predict from "../controllers/predict_check.js";
 import TimeToBag from "../controllers/time_to_bag.js";
 import Hourly from "../controllers/hourly.js";
-import { postJobToDB, getJobsFromDB, modifyJob, deleteJob } from "../db.js";
+import {
+	postJobToDB,
+	getJobsFromDB,
+	modifyJob,
+	deleteJob,
+	deselectJobs,
+	selectJob,
+} from "../db.js";
 let jobs = [];
 const redirectLogin = (req, res, next) => {
 	if (!req.session.userId) {
@@ -74,12 +78,9 @@ function jobSelected(jobs) {
 
 function translateIsHourly(isHourly) {
 	let hourly;
-	console.log("isHourly: ", isHourly);
 	if (isHourly === "hourly" || isHourly === "salary") {
 		hourly = isHourly == "hourly";
-		console.log("inside: ", hourly);
 		hourly = hourly ? "Hourly" : "Salary";
-		console.log("inside2: ", hourly);
 	} else if (isHourly === true || isHourly === false) {
 		if (isHourly === true) {
 			hourly = "Hourly";
@@ -93,7 +94,6 @@ function translateIsHourly(isHourly) {
 			hourly = false;
 		}
 	}
-	console.log("hourly: ", hourly);
 	return hourly;
 }
 
@@ -437,7 +437,7 @@ Router.get("/enter-job", redirectLogin, (req, res) => {
 	}
 });
 
-Router.post("/enter-job", redirectLogin, (req, res) => {
+Router.post("/enter-job", redirectLogin, async (req, res) => {
 	const { user } = res.locals;
 	let { frequency, tax, payRate, isHourly, hours, days, save, name } = req.body;
 	isHourly = isHourly === "hourly" ? "Hourly" : "Salary";
@@ -457,14 +457,15 @@ Router.post("/enter-job", redirectLogin, (req, res) => {
 		hours: hours,
 		days: days,
 		id: id,
-		selected: false,
+		selected: true,
 	};
-	// // make any job that was selected before no longer selected
-	// for(job of req.session.jobs){
-	//     if(job.selected) {
-	//         job.selected = false
-	//     }
-	// }
+	await deselectJobs();
+	for (let job of req.session.jobs) {
+		// set all jobs selected attribute to false
+		if (job.selected) {
+			job.selected = false;
+		}
+	}
 
 	// if they said save the job the it goes to db other wise it just goes to session list
 	if (save) {
@@ -490,10 +491,12 @@ Router.get("/jobs", redirectLogin, (req, res) => {
 	}
 });
 // handles selected
-Router.post("/jobs", redirectLogin, (req, res) => {
+Router.post("/jobs", redirectLogin, async (req, res) => {
 	const { user } = res.locals;
 	let jobs = req.session.jobs;
 	let jobId = req.body.jobId;
+	await deselectJobs();
+	await selectJob(jobId);
 	// if when you select another job any job is selected it makes it false and makes the job you selected at that id true
 	for (let job of jobs) {
 		// set all jobs selected attribute to false
@@ -568,6 +571,22 @@ Router.post("/modify", redirectLogin, async (req, res) => {
 	});
 
 	res.status(201).redirect("jobs");
+});
+
+Router.get("/unemployed", redirectLogin, async (req, res) => {
+	try {
+		console.log("should deselect");
+		await deselectJobs();
+		for (let job of req.session.jobs) {
+			// set all jobs selected attribute to false
+			if (job.selected) {
+				job.selected = false;
+			}
+		}
+		res.status(201).redirect("jobs");
+	} catch {
+		res.status(201).render("error");
+	}
 });
 
 export default Router;
