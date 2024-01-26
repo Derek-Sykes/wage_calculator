@@ -86,7 +86,7 @@ export async function postJobToDB(job, userId) {
 	}
 	hours = !hours ? null : hours;
 	days = !days ? null : days;
-	const [result] = await pool.query(
+	await pool.query(
 		`
     INSERT INTO jobs (job_id, title, pay_frequency, tax, pay_rate, is_hourly, hours, days, user_id, selected)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -125,7 +125,7 @@ export async function modifyJob(job) {
 	isHourly == true || isHourly == "Hourly" ? (isHourly = 1) : (isHourly = 0);
 	hours = !hours ? null : hours;
 	days = !days ? null : days;
-	const [result] = await pool.query(
+	await pool.query(
 		`
 		UPDATE jobs
 		SET title = ?,
@@ -149,7 +149,7 @@ export async function deleteJob(id, userId) {
 			user_id = rows[0].user_id;
 		}
 		if (userId == user_id) {
-			const [result] = await pool.query(
+			await pool.query(
 				`
 				DELETE FROM jobs
 				WHERE job_id = ?;
