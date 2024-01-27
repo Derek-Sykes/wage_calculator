@@ -1,0 +1,11 @@
+<main class="center">
+	<h3>Sell stocks</h3>
+	<br />
+	<p>The price of <%= ticker %> is <%= price %></p>
+	<form action="/sell" method="post" id="ejf">
+		<input type="hidden" name="ticker" value="<%= ticker %>" />
+		<label id="sharesl" for="type">How many shares would you like to sell: </label>
+		<input type="text" name="shares" id="shares" /><br />
+		<input type="submit" id="submit" />
+	</form>
+</main>

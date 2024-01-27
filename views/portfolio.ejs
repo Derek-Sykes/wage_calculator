@@ -1,5 +1,6 @@
 <main class="center">
 	<h3>Portfolio</h3>
+  <p><%=  message %></p>
 	<br />
     <h4>Your total cash balance is: <%= cash %></h4>
 	<% if(portfolio.length){ %>
@@ -10,11 +11,14 @@
                   
                   <h6 class="card-subtitle mb-2 text-body-secondary">Stock details:</h6><hr>
                   <!-- <p class="card-text">Company Name: <%= stock.name %></p> -->
-                  <p class="card-text">Purchase price: <%= stock.price %></p>
-                  <p class="card-text">Shares owned: <%= stock.shares %></p>
+                  <p class="card-text">Purchase Price: <%= stock.price %></p>
+                  <p class="card-text">Shares Owned: <%= stock.shares %></p>
+                  <p class="card-text">Total Cost: <%= stock.cost %></p>
+                  <p class="card-text">Current Price: <%= stock.currentPrice %></p>
+                  <p class="card-text">Current Value: <%= stock.currentValue %></p>
                   
-                  <a href="/sell?jobId=<%= stock.ticker %>" class="card-link">Sell</a>
-                  <a href="/buy-stocks?jobId=<%= stock.ticker %>" class="card-link">Buy</a>
+                  <a href="/sell?ticker=<%= stock.ticker %>" class="card-link">Sell</a>
+                  <a href="/buy-stocks?ticker=<%= stock.ticker %>" class="card-link">Buy</a>
                 </div>
               </div>
             </div>
@@ -25,4 +29,6 @@
             <a href="/stocks" class="text-center">Buy Stock</a>
           </div>
     <% } %>
+
+    
 </main>

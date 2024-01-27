@@ -114,6 +114,7 @@ async function getStockPrice(stock) {
 	await liveStockPrice(stock)
 		.then((price) => {
 			console.log("Stock price:", price);
+			price = parseInt(price).toFixed(2);
 			price1 = price;
 		})
 		.catch((error) => {
@@ -681,8 +682,7 @@ Router.post("/stocks", redirectLogin, async (req, res) => {
 Router.get("/buy-stocks", redirectLogin, async (req, res) => {
 	try {
 		const { user } = res.locals;
-		let stock = req.query.buy;
-		console.log("stock: ", stock);
+		let stock = req.query.ticker;
 		let price = await getStockPrice(stock);
 		res.status(201).render("buy-stocks", {
 			...getUserInfo(user, "buy-stocks"),
@@ -695,39 +695,114 @@ Router.get("/buy-stocks", redirectLogin, async (req, res) => {
 });
 
 Router.post("/buy-stocks", redirectLogin, async (req, res) => {
+	let message;
 	try {
 		const { user } = res.locals;
 		let { shares, stock } = req.body;
+		let portfolio = req.session.invest.portfolio;
 		shares = parseInt(shares);
 		console.log("info: ", shares, stock);
 		let price = await getStockPrice(stock);
 		let cost = shares * price;
-		req.session.invest.cash -= cost;
-		let newstock = {
-			ticker: stock,
-			shares: shares,
+		if (req.session.invest.cash - cost >= 0) {
+			req.session.invest.cash -= cost;
+			let newstock = {
+				ticker: stock,
+				shares: shares,
+				price: price,
+				cost: cost,
+				currentPrice: price,
+				currentValue: cost,
+			};
+			console.log(newstock);
+			let exists = portfolio.filter((stock) => stock.ticker === newstock.ticker)[0];
+			if (exists) {
+				portfolio.forEach((stock) => {
+					if (exists.ticker === stock.ticker) {
+						let newPurchasePrice =
+							(stock.price * stock.shares + newstock.price * newstock.shares) /
+							(stock.shares + newstock.shares);
+						let newShares = stock.shares + newstock.shares;
+						let newValue = stock.price * stock.shares + newstock.price * newstock.shares;
+						stock.shares = newShares;
+						stock.price = newPurchasePrice;
+						stock.cost = newValue;
+					}
+				});
+				message = "purchase success";
+			} else {
+				portfolio.unshift(newstock);
+				message = "purchase success";
+			}
+		} else {
+			message = "Insuffcient funds";
+		}
+
+		res.status(201).redirect(`/portfolio?message=${message}`);
+	} catch (e) {
+		console.log(e);
+	}
+});
+
+Router.get("/sell", redirectLogin, async (req, res) => {
+	try {
+		const { user } = res.locals;
+		let ticker = req.query.ticker;
+		let price = await getStockPrice(ticker);
+		let cash = req.session.invest.cash;
+		res.status(201).render("sell", {
+			...getUserInfo(user, "sell"),
+			ticker: ticker,
 			price: price,
-		};
-		console.log(newstock);
-		req.session.invest.portfolio.unshift(newstock);
+			cash: cash,
+		});
+	} catch (e) {
+		console.log(e);
+		res.status(201).render("error", { ...getUserInfo("", "portfolio") });
+	}
+});
+
+Router.post("/sell", redirectLogin, async (req, res) => {
+	try {
+		let { ticker, shares } = req.body;
+		let portfolio = req.session.invest.portfolio;
+		let cash = req.session.invest.cash;
+		let currentPrice = await getStockPrice(ticker);
+		for (let stock of portfolio) {
+			if (stock.ticker === ticker) {
+				let gain = currentPrice * shares;
+				stock.cost -= (stock.cost / stock.shares) * shares;
+				stock.shares -= shares;
+				cash = parseInt(cash);
+				gain = parseInt(gain);
+				req.session.invest.cash = (cash + gain).toFixed(2);
+			}
+		}
 		res.status(201).redirect("portfolio");
 	} catch (e) {
 		console.log(e);
+		res.status(201).render("error", { ...getUserInfo("", "portfolio") });
 	}
 });
 
 Router.get("/portfolio", redirectLogin, async (req, res) => {
 	try {
 		const { user } = res.locals;
+		let message = req.query.message || "";
 		console.log("cash: ", req.session.invest.cash);
 		let portfolio = req.session.invest.portfolio || [];
-		let price = 0;
 		let cash = req.session.invest.cash;
+		for (let stock of portfolio) {
+			stock.currentValue = (await getStockPrice(stock.ticker)) * stock.shares;
+			console.log("current value: ", stock.currentValue);
+			stock.currentPrice = await getStockPrice(stock.ticker);
+		}
+		console.log("after");
 		res.status(201).render("portfolio", {
 			...getUserInfo(user, "Portfolio"),
-			price: price,
 			portfolio: portfolio,
 			cash: cash,
+			message: message,
 		});
 	} catch (e) {
 		console.log(e);

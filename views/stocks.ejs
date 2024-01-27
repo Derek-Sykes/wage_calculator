@@ -12,7 +12,7 @@
 	<p>The price of <%= stock %> is <%= price %></p>
 	<% if(stock!=='nothing' && stock!== 'invalid' && stock!== 'error'){ %>
 	<form action="/buy-stocks" method="get">
-		<button id="buy" value="<%= stock %>" name="buy">Buy</button>
+		<button id="ticker" value="<%= stock %>" name="ticker">Buy</button>
 	</form>
 	<% } %>
 </main>
