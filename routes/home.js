@@ -708,7 +708,7 @@ Router.post("/buy-stocks", redirectLogin, async (req, res) => {
 		let cost = shares * price;
 		if (req.session.invest.cash - cost >= 0) {
 			req.session.invest.cash -= cost;
-			modifyCash(-cost, user.username)
+			await modifyCash(-cost, user.username);
 			let dbstock = {
 				ticker: stock,
 				quantity: shares,
@@ -818,6 +818,7 @@ Router.post("/sell", redirectLogin, async (req, res) => {
 					cash = parseInt(cash);
 					gain = parseInt(gain);
 					req.session.invest.cash = (cash + gain).toFixed(2);
+					await modifyCash(gain, user.username);
 				} else {
 					message = "you dont own that many shares";
 				}

@@ -79,6 +79,12 @@ async function getJobs(id) {
 	return jobs;
 }
 
+async function getCashdb(username) {
+	let user = await getUser(username);
+	let cash = user.cash;
+	return cash;
+}
+
 function convertDbStockstoSession(dbstocks) {
 	let stocks = [];
 	for (let stock of dbstocks) {
@@ -149,7 +155,8 @@ Router.post("/login", redirectHome, async (req, res) => {
 		if (user && isMatch) {
 			req.session.userId = user.id;
 			req.session.jobs = await getJobs(user.id);
-			req.session.invest = { cash: 10000 };
+			let cash = await getCashdb(username);
+			req.session.invest = { cash: cash };
 			let dbstocks = (await getStocksFromDB(user.id)) || []; // if no stocks in the database
 			let stocks = convertDbStockstoSession(dbstocks);
 			req.session.invest.portfolio = stocks;
@@ -169,17 +176,19 @@ Router.post("/login", redirectHome, async (req, res) => {
 Router.post("/register", redirectHome, async (req, res) => {
 	const { fname, lname, email, username, password } = req.body;
 	const hash = await bcrypt.hash(password, 11);
+	const initialCash = 10000;
 	let message;
 
 	if (fname && lname && email && username && password) {
 		const exists = users.some((user) => user.username === username || user.email === email);
 		// creates account
 		if (!exists && isSecure(password)) {
-			let user = await createUser(fname, lname, username, email, hash);
+			let user = await createUser(fname, lname, username, email, hash, initialCash);
 			req.session.userId = user.id;
 			updateDB();
-			req.session.invest = { cash: 10000 };
-			//req.session.invest.cash = 10000;
+			req.session.invest = { cash: initialCash };
+			req.session.invest.portfolio = [];
+			req.session.jobs = [];
 			return res.redirect("/home");
 		} else if (exists) {
 			// account exists

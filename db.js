@@ -35,14 +35,14 @@ export async function getUser(username) {
 	return rows[0];
 }
 
-export async function createUser(first_name, last_name, username, email, password) {
+export async function createUser(first_name, last_name, username, email, password, cash) {
 	if (typeof (await getUser(username)) == "undefined") {
 		const [result] = await pool.query(
 			`
-        INSERT INTO accounts (first_name, last_name, username, email, password)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO accounts (first_name, last_name, username, email, password, cash)
+        VALUES (?, ?, ?, ?, ?, ?)
         `,
-			[first_name, last_name, username, email, password]
+			[first_name, last_name, username, email, password, cash]
 		);
 		const id = result.insertId - 1;
 		let value = await getUsersJson();
@@ -239,7 +239,8 @@ export async function modifyStock(stock) {
 }
 
 export async function modifyCash(amount, username) {
-	let currentCash = await getUser(username).cash;
+	let currentCash = await getUser(username);
+	currentCash = parseInt(currentCash.cash);
 	if (currentCash + amount > 0) {
 		await pool.query(
 			`
