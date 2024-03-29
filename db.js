@@ -188,3 +188,66 @@ export async function selectJob(jobId) {
 		console.log("ERROR: ", e);
 	}
 }
+
+export async function addStockToDB(stock) {
+	let { name, ticker, purchase_price, quantity, user_id } = stock;
+
+	await pool.query(
+		`
+    INSERT INTO stocks (name, ticker, purchase_price, quantity, user_id)
+    VALUES (?, ?, ?, ?, ?);
+    `,
+		[name, ticker, purchase_price, quantity, user_id]
+	);
+}
+
+export async function getStocksFromDB(id) {
+	let stocks = [];
+	try {
+		const [rows] = await pool.query(`SELECT * FROM stocks WHERE user_id = ?`, [id]);
+		for (let row of rows) {
+			let stock = {
+				s_id: row.s_id,
+				name: row.name,
+				ticker: row.ticker,
+				purchase_price: row.purchase_price,
+				quantity: row.quantity,
+				user_id: row.user_id,
+			};
+			stocks.unshift(stock);
+		}
+	} catch (e) {
+		console.log(`ERROR: ${e}`);
+	}
+	return stocks;
+}
+
+export async function modifyStock(stock) {
+	let { s_id, name, ticker, purchase_price, quantity, user_id } = stock;
+	await pool.query(
+		`
+		UPDATE stocks
+		SET name = ?,
+			ticker = ?,
+			purchase_price = ?, 
+			quantity = ?,
+			user_id = ?
+		WHERE s_id = ?;
+    `,
+		[name, ticker, purchase_price, quantity, user_id, s_id]
+	);
+}
+
+export async function modifyCash(amount, username) {
+	let currentCash = await getUser(username).cash;
+	if (currentCash + amount > 0) {
+		await pool.query(
+			`
+			UPDATE accounts 
+			SET cash = cash + ?
+			WHERE username = ?;
+			`,
+			[amount, username]
+		);
+	}
+}

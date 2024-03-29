@@ -1,6 +1,14 @@
 import express from "express";
 const Router = express.Router();
-import { getUser, createUser, deleteUser, updateUser, getUsersJson, getJobsFromDB } from "../db.js";
+import {
+	getUser,
+	createUser,
+	deleteUser,
+	updateUser,
+	getUsersJson,
+	getJobsFromDB,
+	getStocksFromDB,
+} from "../db.js";
 import bodyParser from "body-parser";
 import session from "express-session";
 import bcrypt from "bcrypt";
@@ -71,6 +79,25 @@ async function getJobs(id) {
 	return jobs;
 }
 
+function convertDbStockstoSession(dbstocks) {
+	let stocks = [];
+	for (let stock of dbstocks) {
+		if (stock.quantity > 0) {
+			let newstock = {
+				ticker: stock.ticker,
+				shares: stock.quantity,
+				price: stock.purchase_price,
+				cost: 0,
+				currentPrice: 0,
+				currentValue: 0,
+				s_id: stock.s_id,
+			};
+			stocks.unshift(newstock);
+		}
+	}
+	return stocks;
+}
+
 //Routes
 
 Router.use((req, res, next) => {
@@ -104,6 +131,7 @@ Router.get("/register", redirectHome, (req, res) => {
 	});
 });
 // login post
+// TODO make the cash attribute apart of the accounts table in sql and update it anytime i update that number
 Router.post("/login", redirectHome, async (req, res) => {
 	const { username, password } = req.body;
 	let message;
@@ -122,7 +150,10 @@ Router.post("/login", redirectHome, async (req, res) => {
 			req.session.userId = user.id;
 			req.session.jobs = await getJobs(user.id);
 			req.session.invest = { cash: 10000 };
-			req.session.invest.portfolio = [];
+			let dbstocks = (await getStocksFromDB(user.id)) || []; // if no stocks in the database
+			let stocks = convertDbStockstoSession(dbstocks);
+			req.session.invest.portfolio = stocks;
+			console.log(req.session.invest.portfolio);
 			console.log(req.session.invest.cash);
 			return res.redirect("/home");
 		} else {
@@ -147,7 +178,8 @@ Router.post("/register", redirectHome, async (req, res) => {
 			let user = await createUser(fname, lname, username, email, hash);
 			req.session.userId = user.id;
 			updateDB();
-			req.session.invest.cash = 10000;
+			req.session.invest = { cash: 10000 };
+			//req.session.invest.cash = 10000;
 			return res.redirect("/home");
 		} else if (exists) {
 			// account exists

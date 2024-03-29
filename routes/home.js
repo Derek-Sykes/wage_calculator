@@ -1,8 +1,7 @@
 // allow user to modify account info
 // find library that will translate stock symbol
-// make sell and buy more work
-// if you buy multiple of the same stock let the session combine them and average the price in retrospect to the amout of shares bought
 // eventually store these stocks in db tied to user. just like jobs.
+// eventually make the amout of money have depend on your job income and take some percent of what they make a month and put it into their investment acct
 
 // update README
 
@@ -22,6 +21,9 @@ import {
 	deleteJob,
 	deselectJobs,
 	selectJob,
+	modifyStock,
+	addStockToDB,
+	modifyCash,
 } from "../db.js";
 let jobs = [];
 const redirectLogin = (req, res, next) => {
@@ -706,6 +708,35 @@ Router.post("/buy-stocks", redirectLogin, async (req, res) => {
 		let cost = shares * price;
 		if (req.session.invest.cash - cost >= 0) {
 			req.session.invest.cash -= cost;
+			modifyCash(-cost, user.username)
+			let dbstock = {
+				ticker: stock,
+				quantity: shares,
+				purchase_price: price,
+				user_id: user.id,
+			};
+			let exist = portfolio.filter((stock) => stock.ticker === dbstock.ticker)[0];
+			if (exist) {
+				portfolio.forEach((stock) => {
+					if (exist.ticker === stock.ticker) {
+						let newPurchasePrice =
+							(stock.price * stock.shares + dbstock.purchase_price * dbstock.quantity) /
+							(stock.shares + dbstock.quantity);
+						let newShares = stock.shares + dbstock.quantity;
+						let modifiedStock = {
+							s_id: stock.s_id,
+							ticker: stock.ticker,
+							quantity: newShares,
+							purchase_price: newPurchasePrice,
+							user_id: user.id,
+						};
+						modifyStock(modifiedStock);
+					}
+				});
+			} else {
+				addStockToDB(dbstock);
+			}
+
 			let newstock = {
 				ticker: stock,
 				shares: shares,
@@ -764,18 +795,38 @@ Router.get("/sell", redirectLogin, async (req, res) => {
 
 Router.post("/sell", redirectLogin, async (req, res) => {
 	try {
+		const { user } = res.locals;
+		let message;
 		let { ticker, shares } = req.body;
 		let portfolio = req.session.invest.portfolio;
 		let cash = req.session.invest.cash;
 		let currentPrice = await getStockPrice(ticker);
 		for (let stock of portfolio) {
 			if (stock.ticker === ticker) {
-				let gain = currentPrice * shares;
-				stock.cost -= (stock.cost / stock.shares) * shares;
-				stock.shares -= shares;
-				cash = parseInt(cash);
-				gain = parseInt(gain);
-				req.session.invest.cash = (cash + gain).toFixed(2);
+				let newShares = stock.shares - shares;
+				if (newShares >= 0) {
+					modifyStock({
+						s_id: stock.s_id,
+						ticker: stock.ticker,
+						quantity: newShares,
+						purchase_price: stock.price,
+						user_id: user.id,
+					});
+					let gain = currentPrice * shares;
+					stock.cost -= (stock.cost / stock.shares) * shares;
+					stock.shares -= shares;
+					cash = parseInt(cash);
+					gain = parseInt(gain);
+					req.session.invest.cash = (cash + gain).toFixed(2);
+				} else {
+					message = "you dont own that many shares";
+				}
+				if (stock.shares <= 0) {
+					const index = portfolio.indexOf(stock);
+					if (index !== -1) {
+						portfolio.splice(index, 1);
+					}
+				}
 			}
 		}
 		res.status(201).redirect("portfolio");
@@ -793,6 +844,7 @@ Router.get("/portfolio", redirectLogin, async (req, res) => {
 		let portfolio = req.session.invest.portfolio || [];
 		let cash = req.session.invest.cash;
 		for (let stock of portfolio) {
+			stock.cost = stock.price * stock.shares;
 			stock.currentValue = (await getStockPrice(stock.ticker)) * stock.shares;
 			console.log("current value: ", stock.currentValue);
 			stock.currentPrice = await getStockPrice(stock.ticker);
