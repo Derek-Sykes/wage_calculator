@@ -1,27 +1,62 @@
 <main>
-    <form action="/register" method="post">
-        First Name: <input type="text" name="fname" required><br><br>
-        Last Name: <input type="text" name="lname" required><br><br>
-        Email: <input type="email" name="email" required><br><br>
-        Username: <input type="text" name="username" required><br><br>
-        Password: <input type="password" name="password" required><br><br>
-        <input type="submit" value="resgister">
-    </form>
+	<form onsubmit="return validateForm(event)" action="/register" method="post">
+		First Name: <input type="text" name="fname" required /><br /><br />
+		Last Name: <input type="text" name="lname" required /><br /><br />
+		Email: <input type="email" name="email" required /><br /><br />
+		Username: <input type="text" name="username" required /><br /><br />
+		Password: <input type="password" name="password" id="password" required /><br /><br />
+		<input type="submit" value="resgister" />
+	</form>
 
-    <p id="message">message</p>
+	<p id="message">message</p>
 
-    <script>
-        // Function to get query parameters from the URL
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
+	<style>
+		.highlight {
+			border: 2px solid red;
+		}
+	</style>
 
-        // Get the "message" parameter from the URL
-        const message = getQueryParam('message') || 'No message received';
+	<script>
+		// Function to get query parameters from the URL
+		function getQueryParam(name) {
+			const urlParams = new URLSearchParams(window.location.search);
+			return urlParams.get(name);
+		}
 
-        // Display the message in the HTML page
-        document.getElementById('message').textContent = message;
-    </script>
+		// Get the "message" parameter from the URL
+		const message = getQueryParam("message") || "No message received";
+
+		function isSecure(str) {
+			return /[A-Z]/.test(str) && /\d/.test(str);
+		}
+		function validateForm(event) {
+			event.preventDefault();
+			// Perform form validation logic here
+			document.getElementById("password").type = "text";
+			let password = document.getElementById("password").value;
+			document.getElementById("password").type = "password";
+			// If validation fails, prevent form submission
+			if (password.length < 8 || !isSecure(password)) {
+				console.log("insecure passwd");
+				document.getElementById("message").textContent =
+					"Password must be at least 8 characters and include atleast 1 uppercase letter and number from frontend";
+				document.getElementById("password").classList.add("highlight");
+			} else {
+				// If validation passes, submit the form
+				let form = event.target;
+				let formData = new FormData(form);
+
+				// Perform any additional actions here, such as displaying a success message
+				console.log("Form submitted successfully");
+
+				// Reset the error message
+				document.getElementById("message").textContent = "";
+
+				// Submit the form
+				form.submit();
+			}
+		}
+		// Display the message in the HTML page
+		document.getElementById("message").textContent = message;
+	</script>
 </main>
-    

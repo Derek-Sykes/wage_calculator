@@ -1,6 +1,4 @@
 // allow user to modify account info
-// find library that will translate stock symbol
-// eventually store these stocks in db tied to user. just like jobs.
 // eventually make the amout of money have depend on your job income and take some percent of what they make a month and put it into their investment acct
 
 // update README
@@ -13,6 +11,7 @@ import TimeToBag from "../controllers/time_to_bag.js";
 import Hourly from "../controllers/hourly.js";
 import liveStockPrice from "live-stock-price";
 import axios from "axios";
+import fs from "fs";
 
 import {
 	postJobToDB,
@@ -24,7 +23,9 @@ import {
 	modifyStock,
 	addStockToDB,
 	modifyCash,
+	deleteFromDb,
 } from "../db.js";
+const stocksJSON = JSON.parse(fs.readFileSync("public/stocks.json", "utf-8"));
 let jobs = [];
 const redirectLogin = (req, res, next) => {
 	if (!req.session.userId) {
@@ -33,6 +34,24 @@ const redirectLogin = (req, res, next) => {
 		next();
 	}
 };
+function convertToTitleCase(str) {
+	return str.replace(/\b\w/g, function (match) {
+		return match.toUpperCase();
+	});
+}
+
+function getStockTicker(name) {
+	name = convertToTitleCase(name);
+	let stocks = stocksJSON.filter((stock) => {
+		let s = stock.Name;
+		return s.indexOf(name) !== -1;
+	});
+	if (stocks[0].Symbol) {
+		return stocks;
+	} else {
+		return "invalid";
+	}
+}
 
 function postJob(req, job) {
 	let userId = req.session.userId;
@@ -40,7 +59,6 @@ function postJob(req, job) {
 	console.log(job);
 	req.session.jobs.unshift(job);
 }
-
 function removeChar(string, char) {
 	if (string.includes(char)) {
 		return string.replace(char, "");
@@ -116,13 +134,14 @@ async function getStockPrice(stock) {
 	await liveStockPrice(stock)
 		.then((price) => {
 			console.log("Stock price:", price);
-			price = parseInt(price).toFixed(2);
+			price = Number(Number(price).toFixed(2));
 			price1 = price;
 		})
 		.catch((error) => {
 			console.error("Invalid tiker symbol");
 			price1 = "invalid";
 		});
+	console.log(typeof price1);
 	return price1;
 }
 async function translateTiker(type, value) {
@@ -653,6 +672,7 @@ Router.get("/stocks", redirectLogin, (req, res) => {
 			...getUserInfo(user, "stocks"),
 			price: "nothing",
 			stock: "nothing",
+			otherOptions: [],
 		});
 	} catch {
 		res.status(201).render("error", { ...getUserInfo("", "stocks") });
@@ -663,18 +683,27 @@ Router.post("/stocks", redirectLogin, async (req, res) => {
 	try {
 		const { user } = res.locals;
 		let { stock, type } = req.body;
+		let otherOptions = [];
 		if (type === "name") {
-			stock = await translateTiker("name", stock);
+			//stock = await translateTiker("name", stock);
+			let stocks = getStockTicker(stock);
+			stock = stocks[0].Symbol;
+
+			for (let s of stocks) {
+				otherOptions.push({ name: s.Name, ticker: s.Symbol });
+			}
 		} else if (type === "ticker") {
 			stock = stock.toUpperCase();
 		}
 
 		let price = await getStockPrice(stock);
+		console.log(price);
 		res.status(201).render("stocks", {
 			...getUserInfo(user, "stocks"),
 			stock: stock,
 			page: "stocks",
 			price: price,
+			otherOptions: otherOptions,
 		});
 	} catch (e) {
 		console.log(e);
@@ -686,6 +715,10 @@ Router.get("/buy-stocks", redirectLogin, async (req, res) => {
 		const { user } = res.locals;
 		let stock = req.query.ticker;
 		let price = await getStockPrice(stock);
+		if (price == "invalid" || price == "error") {
+			return res.redirect("/stocks");
+		}
+		price = Number(price);
 		res.status(201).render("buy-stocks", {
 			...getUserInfo(user, "buy-stocks"),
 			price: price,
@@ -706,6 +739,7 @@ Router.post("/buy-stocks", redirectLogin, async (req, res) => {
 		console.log("info: ", shares, stock);
 		let price = await getStockPrice(stock);
 		let cost = shares * price;
+		let s_id;
 		if (req.session.invest.cash - cost >= 0) {
 			req.session.invest.cash -= cost;
 			await modifyCash(-cost, user.username);
@@ -723,6 +757,7 @@ Router.post("/buy-stocks", redirectLogin, async (req, res) => {
 							(stock.price * stock.shares + dbstock.purchase_price * dbstock.quantity) /
 							(stock.shares + dbstock.quantity);
 						let newShares = stock.shares + dbstock.quantity;
+						s_id = stock.s_id;
 						let modifiedStock = {
 							s_id: stock.s_id,
 							ticker: stock.ticker,
@@ -734,10 +769,11 @@ Router.post("/buy-stocks", redirectLogin, async (req, res) => {
 					}
 				});
 			} else {
-				addStockToDB(dbstock);
+				s_id = await addStockToDB(dbstock);
 			}
 
 			let newstock = {
+				s_id: s_id,
 				ticker: stock,
 				shares: shares,
 				price: price,
@@ -815,12 +851,15 @@ Router.post("/sell", redirectLogin, async (req, res) => {
 					let gain = currentPrice * shares;
 					stock.cost -= (stock.cost / stock.shares) * shares;
 					stock.shares -= shares;
-					cash = parseInt(cash);
-					gain = parseInt(gain);
+					cash = Number(cash);
+					gain = Number(gain);
 					req.session.invest.cash = (cash + gain).toFixed(2);
 					await modifyCash(gain, user.username);
 				} else {
 					message = "you dont own that many shares";
+				}
+				if (newShares === 0) {
+					deleteFromDb(stock.s_id);
 				}
 				if (stock.shares <= 0) {
 					const index = portfolio.indexOf(stock);
@@ -839,16 +878,19 @@ Router.post("/sell", redirectLogin, async (req, res) => {
 
 Router.get("/portfolio", redirectLogin, async (req, res) => {
 	try {
+		let value = 0;
 		const { user } = res.locals;
 		let message = req.query.message || "";
 		console.log("cash: ", req.session.invest.cash);
 		let portfolio = req.session.invest.portfolio || [];
-		let cash = req.session.invest.cash;
+		let cash = parseFloat(req.session.invest.cash);
 		for (let stock of portfolio) {
+			let currentPrice = await getStockPrice(stock.ticker);
 			stock.cost = stock.price * stock.shares;
-			stock.currentValue = (await getStockPrice(stock.ticker)) * stock.shares;
+			stock.currentValue = Number((currentPrice * stock.shares).toFixed(2));
 			console.log("current value: ", stock.currentValue);
-			stock.currentPrice = await getStockPrice(stock.ticker);
+			stock.currentPrice = currentPrice;
+			value += stock.currentValue;
 		}
 		console.log("after");
 		res.status(201).render("portfolio", {
@@ -856,6 +898,7 @@ Router.get("/portfolio", redirectLogin, async (req, res) => {
 			portfolio: portfolio,
 			cash: cash,
 			message: message,
+			value: value,
 		});
 	} catch (e) {
 		console.log(e);

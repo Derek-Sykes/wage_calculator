@@ -199,6 +199,12 @@ export async function addStockToDB(stock) {
     `,
 		[name, ticker, purchase_price, quantity, user_id]
 	);
+	let s_id = await pool.query(`SELECT s_id FROM stocks WHERE user_id = ? AND ticker =  ?`, [
+		user_id,
+		ticker,
+	]);
+	console.log("s_id: ", s_id[0][0].s_id);
+	return s_id[0][0].s_id;
 }
 
 export async function getStocksFromDB(id) {
@@ -210,7 +216,7 @@ export async function getStocksFromDB(id) {
 				s_id: row.s_id,
 				name: row.name,
 				ticker: row.ticker,
-				purchase_price: row.purchase_price,
+				purchase_price: parseFloat(row.purchase_price),
 				quantity: row.quantity,
 				user_id: row.user_id,
 			};
@@ -251,4 +257,14 @@ export async function modifyCash(amount, username) {
 			[amount, username]
 		);
 	}
+}
+
+export async function deleteFromDb(s_id) {
+	await pool.query(
+		`
+		DELETE FROM stocks 
+		WHERE s_id = ?
+		`,
+		[s_id]
+	);
 }

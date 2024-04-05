@@ -9,10 +9,28 @@
 		<input type="text" name="stock" id="stock" /><br />
 		<input type="submit" id="submit" />
 	</form>
+	<% if(typeof price ==='number'){ %>
+	<p>
+		The price of <%= stock %> is $<%= new Intl.NumberFormat('en-US', { minimumFractionDigits: 2,
+		maximumFractionDigits: 2 }).format(Number(price)) %>
+	</p>
+	<% }else{ %>
 	<p>The price of <%= stock %> is <%= price %></p>
-	<% if(stock!=='nothing' && stock!== 'invalid' && stock!== 'error'){ %>
+	<% } %> <% if(stock!=='nothing' && price!== 'invalid' && price!== 'error'){ %>
 	<form action="/buy-stocks" method="get">
 		<button id="ticker" value="<%= stock %>" name="ticker">Buy</button>
 	</form>
 	<% } %>
+	<div class="card" style="width: 18rem">
+		<div class="card-body">
+			<h5 class="card-title">Other possabilities:</h5>
+			<% if(otherOptions.length){ %> <% for(stock of otherOptions){ %>
+			<br />
+			<p class="card-text">Company name: <%= stock.name %></p>
+			<p class="card-text">Ticker Symbol: <%= stock.ticker %></p>
+			<!-- <h6 class="card-subtitle mb-2 text-body-secondary"></h6> -->
+			<hr />
+			<% } %> <% } %>
+		</div>
+	</div>
 </main>

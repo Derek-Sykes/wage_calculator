@@ -2,7 +2,9 @@
 	<h3>Portfolio</h3>
   <p><%=  message %></p>
 	<br />
-    <h4>Your total cash balance is: <%= cash %></h4>
+    <h4>Total cash balance: $<%= new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(cash)) %></h4>
+    <h4>Total stock value: $<%= new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value)) %></h4>
+    <h4>Total portfolio value: $<%= new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value + cash)) %></h4>
 	<% if(portfolio.length){ %>
         <% for(stock of portfolio){ %>
             <div class="card" style="width: 18rem;">
@@ -11,11 +13,11 @@
                   
                   <h6 class="card-subtitle mb-2 text-body-secondary">Stock details:</h6><hr>
                   <!-- <p class="card-text">Company Name: <%= stock.name %></p> -->
-                  <p class="card-text">Purchase Price: <%= stock.price %></p>
+                  <p class="card-text">Purchase Price: $<%= new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(stock.price)) %></p>
                   <p class="card-text">Shares Owned: <%= stock.shares %></p>
-                  <p class="card-text">Total Cost: <%= stock.cost %></p>
-                  <p class="card-text">Current Price: <%= stock.currentPrice %></p>
-                  <p class="card-text">Current Value: <%= stock.currentValue %></p>
+                  <p class="card-text">Total Cost: $<%= new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(stock.cost)) %></p>
+                  <p class="card-text">Current Price: $<%= new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(stock.currentPrice)) %></p>
+                  <p class="card-text">Current Value: $<%= new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(stock.currentValue)) %></p>
                   
                   <a href="/sell?ticker=<%= stock.ticker %>" class="card-link">Sell</a>
                   <a href="/buy-stocks?ticker=<%= stock.ticker %>" class="card-link">Buy</a>
