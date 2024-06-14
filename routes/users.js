@@ -93,7 +93,7 @@ function convertDbStockstoSession(dbstocks) {
 				ticker: stock.ticker,
 				shares: stock.quantity,
 				price: stock.purchase_price,
-				cost: 0,
+				cost: stock.quantity * stock.purchase_price,
 				currentPrice: 0,
 				currentValue: 0,
 				s_id: stock.s_id,

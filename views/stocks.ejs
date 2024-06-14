@@ -11,8 +11,8 @@
 	</form>
 	<% if(typeof price ==='number'){ %>
 	<p>
-		The price of <%= stock %> is $<%= new Intl.NumberFormat('en-US', { minimumFractionDigits: 2,
-		maximumFractionDigits: 2 }).format(Number(price)) %>
+		The price of <%= name %> (<%= stock %>) is $<%= new Intl.NumberFormat('en-US', {
+		minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(price)) %>
 	</p>
 	<% }else{ %>
 	<p>The price of <%= stock %> is <%= price %></p>
