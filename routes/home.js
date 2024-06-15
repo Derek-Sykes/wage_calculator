@@ -701,7 +701,7 @@ Router.post("/enter-job", redirectLogin, async (req, res) => {
 			job.selected = false;
 		}
 	}
-
+	//hi
 	// if they said save the job the it goes to db other wise it just goes to session list
 	if (save) {
 		postJob(req, job);
